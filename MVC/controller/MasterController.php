@@ -1,0 +1,80 @@
+<?php
+class MasterController {
+    protected $model;
+    protected $view;
+
+    public function __construct() {
+        // Khởi tạo kết nối database
+        
+    }
+
+    // Phương thức render view
+    protected function render($view, $data = []) {
+        // Chuyển đổi mảng data thành các biến để sử dụng trong view
+        extract($data);
+        
+        // Đường dẫn đến file view
+        $viewPath = "view/" . $view . "/index.php";
+        
+        // Kiểm tra file view có tồn tại không
+        if (file_exists($viewPath)) {
+            require_once $viewPath;
+        } else {
+            die("View không tồn tại: " . $viewPath);
+        }
+    }
+
+    // Phương thức chuyển hướng
+    protected function redirect($url) {
+        header("Location: " . $url);
+        exit();
+    }
+
+    // Phương thức kiểm tra request method
+    protected function isPost() {
+        return $_SERVER['REQUEST_METHOD'] === 'POST';
+    }
+
+    protected function isGet() {
+        return $_SERVER['REQUEST_METHOD'] === 'GET';
+    }
+
+    // Phương thức lấy dữ liệu từ POST request
+    protected function getPost($key = null) {
+        if ($key === null) {
+            return $_POST;
+        }
+        return isset($_POST[$key]) ? $_POST[$key] : null;
+    }
+
+    // Phương thức lấy dữ liệu từ GET request
+    protected function getQuery($key = null) {
+        if ($key === null) {
+            return $_GET;
+        }
+        return isset($_GET[$key]) ? $_GET[$key] : null;
+    }
+
+    // Phương thức xử lý lỗi
+    protected function handleError($message, $code = 404) {
+        http_response_code($code);
+        $this->render('error', ['message' => $message]);
+        exit();
+    }
+
+    // Phương thức kiểm tra đăng nhập
+    protected function checkLogin() {
+        if (!isset($_SESSION['user'])) {
+            $this->redirect('?controller=Auth&action=login');
+        }
+    }
+
+    // Phương thức kiểm tra quyền admin
+    protected function checkAdmin() {
+        $this->checkLogin();
+        if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
+            $this->handleError('Bạn không có quyền truy cập trang này', 403);
+        }
+    }
+}
+?>

@@ -39,14 +39,14 @@ class Users extends MasterController
                 
                 $_SESSION['nhanvien'] = $user;
                 // Thông thường ở đây bạn sẽ chuyển hướng người dùng đến trang dashboard
-                header('Location: ?controller=Home&action=index');
+                echo "<script>window.location.href = '?controller=Home&action=index';</script>";
                 exit();
             } else {
                 // XÁC THỰC THẤT BẠI
                 // Đây là nơi bạn thực thi logic mà ban đầu nằm trong khối `else` của bạn
-                echo "Login Failed controller";
+                $error = "Tài khoản hoặc mật khẩu không chính xác";
                 // Render lại form đăng nhập với thông báo lỗi
-                $this->render('Authentication/Login');
+                $this->render('Authentication/Login', ['error' => $error]);
             }
         } else {
             // Nếu không có dữ liệu POST, tức là người dùng vừa truy cập trang đăng nhập

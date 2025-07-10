@@ -23,12 +23,14 @@ class UsersModel extends MasterModel
         if($result && $result->rowCount() > 0){
         
             $result = $result->fetch(PDO::FETCH_ASSOC);
+            
             $_SESSION['nhanvien'] = [
-                'MaNhanVien' => $result[0]['MaNhanVien'],
-                'TenDangNhapNV' => $result[0]['TenDangNhapNV'],
-                'HoTenNV' => $result[0]['HoTenNV'],
-                'EmailNV' => $result[0]['EmailNV']
-            ];
+                'MaNhanVien' => $result['MaNhanVien'],
+                'TenDangNhapNV' => $result['TenDangNhapNV'],
+                    'HoTenNV' => $result['HoTenNV'],
+                    'EmailNV' => $result['EmailNV']
+                ];
+            
             return true;
         }
         else{

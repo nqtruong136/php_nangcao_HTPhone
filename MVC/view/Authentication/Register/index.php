@@ -28,7 +28,7 @@
             </div>
             <!-- form Footer -->
             <div class="register-footer">
-                <p> Already have an account? <a href="../Login/index.php"> Login</a> here</p>
+                <p> Already have an account? <a href="?controller=Users&action=Login"> Login</a> here</p>
                 <button class="submit-btn3">Sign Up</button>
             </div>
         </div>

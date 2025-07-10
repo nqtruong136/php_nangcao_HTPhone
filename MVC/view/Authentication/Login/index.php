@@ -26,7 +26,7 @@
                 </div>
                 <!-- form Footer -->
                 <div class="login-footer">
-                    <p>Don’t have an account? <a href="../Register/index.php">Sign Up</a>  here</p>
+                    <p>Don’t have an account? <a href="?controller=Users&action=Register">Sign Up</a>  here</p>
                     <input type="submit" class="submit-btn3" value="Login">
                 </div>
             </div>

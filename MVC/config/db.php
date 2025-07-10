@@ -5,7 +5,7 @@ class Connect{
 
     //Kết nối database
     public function __construct(){ //ham khoi tao
-        $dsn='mysql:host=localhost;dbname=mvc_book';
+        $dsn='mysql:host=172.25.173.248;dbname=mvc_book';
         $user='root'; $pass='';
         $this->db=new PDO($dsn,$user,$pass, array(PDO::MYSQL_ATTR_INIT_COMMAND
         => "SET NAMES utf8"));

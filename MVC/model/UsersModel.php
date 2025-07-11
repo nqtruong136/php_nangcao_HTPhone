@@ -18,17 +18,32 @@ class UsersModel extends MasterModel
         $password = md5($password);
         
         try{
-        $select = "select * from nhanvien where TenDangNhapNV = :username and MatKhauNV = :password";
+        $select = "select * from nguoidung where TenDangNhap = :username and MatKhau = :password";
         $result = $db->query($select, ['username' => $username, 'password' => $password]);
         if($result && $result->rowCount() > 0){
-        
+            if($result['MaVaiTro']=='1'){
+                $vt = "Khách Hàng";
+            }
+            if($result['MaVaiTro']=='2'){
+                $vt = "Tác Giả";
+            }
+            if($result['MaVaiTro']=='3'){
+                $vt = "Quản lý nội dung";
+            }
+            if($result['MaVaiTro']=='4'){
+                $vt = "Quản Lý Đơn Hàng";
+            }
+            if($result['MaVaiTro']=='5'){
+                $vt = "Admin";
+            }
             $result = $result->fetch(PDO::FETCH_ASSOC);
             
             $_SESSION['nhanvien'] = [
                 'MaNhanVien' => $result['MaNhanVien'],
                 'TenDangNhapNV' => $result['TenDangNhapNV'],
                     'HoTenNV' => $result['HoTenNV'],
-                    'EmailNV' => $result['EmailNV']
+                    'EmailNV' => $result['EmailNV'],
+                    'VaiTro' => $vt
                 ];
             
             return true;
@@ -36,6 +51,7 @@ class UsersModel extends MasterModel
         else{
             return false;
         }
+        
         }
         catch(PDOException $e){
             echo "Lỗi: " . $e->getMessage();

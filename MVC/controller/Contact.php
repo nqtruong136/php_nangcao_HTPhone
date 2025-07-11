@@ -1,5 +1,5 @@
 <?php
-require_once 'model/'.$controller.'.php';
+require_once 'model/ContactModel.php';
 class Contact extends MasterController
 {
     public function index()

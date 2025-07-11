@@ -1,5 +1,5 @@
 <?php
-
+require_once 'model/UsersModel.php';
 
 class Users extends MasterController
 {

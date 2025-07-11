@@ -1,5 +1,5 @@
 <?php
-require_once 'model/'.$controller.'.php';
+require_once 'model/BooksModel.php';
 class Books extends MasterController
 {
     public function index()

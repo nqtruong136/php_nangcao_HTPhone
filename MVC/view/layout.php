@@ -140,7 +140,7 @@
                                     <div class="header-info-left d-flex align-items-center">
                                         <!-- logo -->
                                         <div class="logo">
-                                            <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
+                                            <a href="?controller=Home&action=index"><img src="assets/img/logo/logo.png" alt=""></a>
                                         </div>
                                         <!-- Search Box -->
                                         <form action="#" class="form-box">

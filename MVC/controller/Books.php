@@ -4,7 +4,13 @@ class Books extends MasterController
 {
     public function index()
     {
-        $this->render('Categories');
+        $md = new BooksModel();
+        $result = $md->get_book_all_by_date();
+        $data = [
+            'data' => $result
+        ];
+        //$data = [];
+        $this->render('Categories',$data);
     }
 }
 ?>

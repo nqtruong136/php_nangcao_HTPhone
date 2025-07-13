@@ -5,5 +5,6 @@ class BlogModel extends MasterModel
     {
         
     }
+    
 }
 ?>

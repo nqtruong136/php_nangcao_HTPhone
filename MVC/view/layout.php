@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="assets/css/slick.css">
     <link rel="stylesheet" href="assets/css/nice-select.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* --- Khối User Menu chính --- */
         .user-menu {
@@ -362,6 +363,7 @@
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/main.js"></script>
 
+    
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="../../../www.googletagmanager.com/gtag/jsa055?id=UA-23581568-13"></script>
     <script>

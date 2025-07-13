@@ -22,6 +22,9 @@ switch($controller){
     case 'Users':
         $controller = new Users();
         break;
+    case 'Details':
+        $controller = new Details();
+        break;
     default:
         $controller = new Home();
         break;

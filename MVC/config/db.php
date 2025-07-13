@@ -30,4 +30,10 @@ class Connect{
         $stmt->execute($params);
         return $stmt;
     }
+    public function getInstance_params($select, $params = array()){
+        $stmt = $this->db->prepare($select);
+        $stmt->execute($params);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
 } ?>

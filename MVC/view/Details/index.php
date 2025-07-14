@@ -32,8 +32,17 @@
                                         </div>
                                         <p>(<?php echo $data1['SoLuotMua']; ?> Review)</p>
                                     </div> 
-                                    <a href="#" class="white-btn mr-10">Add to Cart</a>
-                                    <a href="#" class="border-btn share-btn"><i class="fas fa-share-alt"></i></a>
+                                    <div class="d-flex align-items-center">
+                                        <form action="?controller=Cart&action=addCart" method="post">
+                                            <input type="hidden" name="id" value="<?php echo $data1['MaSach']; ?>">
+                                            <input type="hidden" name="name" value="<?php echo $data1['TenSach']; ?>">
+                                            <input type="hidden" name="price" value="<?php echo $data1['GiaBan']; ?>">
+                                            <input type="hidden" name="img" value="<?php echo $data1['AnhBia']; ?>">
+                                            <button type="submit" class="white-btn mr-10">Add to Cart</button>
+                                        </form>
+                                        <a href="#" class="border-btn share-btn"><i class="fas fa-share-alt"></i></a>
+                                    </div>
+                                    
                                 </div>
                             </div>
                             <?php

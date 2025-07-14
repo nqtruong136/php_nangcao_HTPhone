@@ -25,6 +25,12 @@ switch($controller){
     case 'Details':
         $controller = new Details();
         break;
+    case 'Cart':
+        $controller = new Cart();
+        break;
+    case 'Checkout':
+        $controller = new Checkout();
+        break;
     default:
         $controller = new Home();
         break;

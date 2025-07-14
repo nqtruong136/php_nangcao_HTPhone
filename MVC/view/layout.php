@@ -153,10 +153,12 @@
                                     </div>
                                     <div class="header-info-right d-flex align-items-center">
                                         <ul style="display: flex; align-items: center;">
-                                            <!--<li><a href="#">FAQ</a></li> cái này là để sau
+                                            <!--<li><a href="#">FAQ</a></li> cái này là để sau,
                                             <li><a href="#">Track Order</a></li>-->
-                                            <li class="shopping-card">
-                                                <a href="cart.html"><img src="assets/img/icon/cart.svg" alt=""></a>
+                                            <li class="shopping-card" data-count="<?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>">
+                                                <a href="?controller=Cart&action=index">
+                                                    <img src="assets/img/icon/cart.svg" alt="Shopping cart icon for accessing the cart page, displayed in the website header navigation area" />
+                                                </a>
                                             </li>
                                             <!--<li><a href="?controller=Users&action=Login" class="btn header-btn">Sign in</a></li>-->
                                             <?php

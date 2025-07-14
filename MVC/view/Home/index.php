@@ -1,4 +1,16 @@
 <main>
+    <?php
+    function formatPriceToK($price) {
+        // Nếu giá tiền lớn hơn hoặc bằng 1000
+        if ($price >= 1000) {
+            // Chia cho 1000, làm tròn xuống và thêm chữ 'K'
+            return floor($price / 1000) . 'K';
+        }
+        
+        // Nếu nhỏ hơn 1000, giữ nguyên
+        return $price;
+    }
+    ?>
         <!-- slider Area Start-->
         <div class="slider-area">
             <div class="container">
@@ -67,32 +79,60 @@
                     <div class="col-xl-12">
                         <div class="selling-active">
                             <!-- Single -->
+                            <?php foreach($data1 as $book){?>
                             <div class="properties pb-20">
                                 <div class="properties-card">
                                     <div class="properties-img">
-                                        <a href="book-details.html"><img src="assets/img/gallery/best_selling1.jpg" alt=""></a>
+                                        <a href="?controller=Details&action=index&id=<?php echo $book['MaSach']; ?>"><img src="assets/img/gallery/anhphp/<?php echo $book['AnhBia']; ?>" alt=""></a>
                                     </div>
                                     <div class="properties-caption">
-                                        <h3><a href="book-details.html">Moon Dance</a></h3>
-                                        <p>J. R Rain</p>
+                                        <h3><a href="?controller=Details&action=index&id=<?php echo $book['MaSach']; ?>"><?php echo $book['TenSach']; ?></a></h3>
+                                        <p><?php echo $book['CacTacGia']; ?></p>
                                         <div class="properties-footer d-flex justify-content-between align-items-center">
                                             <div class="review">
                                                 <div class="rating">
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star-half-alt"></i>
+                                                <?php
+                                                            // Giả sử $book['DiemTrungBinh'] có giá trị là 4.3 hoặc 4.7 v.v...
+                                                            $rating = $book['DiemTrungBinh'];
+
+                                                            // 1. Tính toán số lượng cho mỗi loại sao
+                                                            $fullStars = floor($rating); // Số sao đầy (làm tròn xuống)
+                                                            $halfStar = ($rating - $fullStars) > 0; // Có sao rưỡi hay không?
+                                                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Số sao trống còn lại
+
+                                                            // --- Bắt đầu vòng lặp để hiển thị ---
+
+                                                            // 2. Vòng lặp để hiển thị các SAO ĐẦY
+                                                            for ($i = 0; $i < $fullStars; $i++) {
+                                                                echo '<i class="fas fa-star" ></i>';
+                                                            }
+
+                                                            // 3. Hiển thị SAO RƯỠI (nếu có)
+                                                            if ($halfStar) {
+                                                                echo '<i class="fas fa-star-half-alt"></i>';
+                                                            }
+
+                                                            // 4. Vòng lặp để hiển thị các SAO TRỐNG
+                                                            for ($i = 0; $i < $emptyStars; $i++) {
+                                                                // Dùng class "far" của Font Awesome cho sao rỗng
+                                                                echo '<i class="far fa-star"></i>';
+                                                            }
+                                                        ?>
                                                 </div>
-                                                <p>(<span>120</span> Review)</p>
+                                                <p>(<span><?php echo $book['SoLuotMua'];?></span></span> Review)</p>
                                             </div>
                                             <div class="price">
-                                                <span>$50</span>
+                                                <span><?php 
+                                                    
+                                                    echo formatPriceToK($book['GiaBan']); ?></span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <?php
+                            }
+                            ?>
                             <!-- Single -->
                             <div class="properties pb-20">
                                 <div class="properties-card">
@@ -376,34 +416,60 @@
                     <div class="tab-pane fade show active" id="nav-one" role="tabpanel" aria-labelledby="nav-one-tab">
                         <!-- Tab 1 -->
                         <div class="row">
+                            <?php foreach($data2 as $book){ ?>
                             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                                 <div class="properties pb-30">
                                     <div class="properties-card">
                                         <div class="properties-img">
-                                            <a href="book-details.html"><img src="assets/img/gallery/best_selling7.jpg" alt=""></a>
+                                            <a href="?controller=Book&action"><img src="assets/img/gallery/anhphp/<?php echo $book['AnhBia']; ?>" alt=""></a>
                                         </div>
                                         <div class="properties-caption properties-caption2">
-                                            <h3><a href="book-details.html">Moon Dance</a></h3>
-                                            <p>J. R Rain</p>
+                                            <h3><a href="?controller=Details&action=index&id=<?php echo $book['MaSach']; ?>"><?php echo $book['TenSach']; ?></a></h3>
+                                            <p><?php echo $book['CacTacGia']; ?></p>
                                             <div class="properties-footer d-flex justify-content-between align-items-center">
                                                 <div class="review">
                                                     <div class="rating">
-                                                        <i class="fas fa-star"></i>
-                                                        <i class="fas fa-star"></i>
-                                                        <i class="fas fa-star"></i>
-                                                        <i class="fas fa-star"></i>
-                                                        <i class="fas fa-star-half-alt"></i>
+                                                    <?php
+                                                            // Giả sử $book['DiemTrungBinh'] có giá trị là 4.3 hoặc 4.7 v.v...
+                                                            $rating = $book['DiemTrungBinh'];
+
+                                                            // 1. Tính toán số lượng cho mỗi loại sao
+                                                            $fullStars = floor($rating); // Số sao đầy (làm tròn xuống)
+                                                            $halfStar = ($rating - $fullStars) > 0; // Có sao rưỡi hay không?
+                                                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0); // Số sao trống còn lại
+
+                                                            // --- Bắt đầu vòng lặp để hiển thị ---
+
+                                                            // 2. Vòng lặp để hiển thị các SAO ĐẦY
+                                                            for ($i = 0; $i < $fullStars; $i++) {
+                                                                echo '<i class="fas fa-star" ></i>';
+                                                            }
+
+                                                            // 3. Hiển thị SAO RƯỠI (nếu có)
+                                                            if ($halfStar) {
+                                                                echo '<i class="fas fa-star-half-alt"></i>';
+                                                            }
+
+                                                            // 4. Vòng lặp để hiển thị các SAO TRỐNG
+                                                            for ($i = 0; $i < $emptyStars; $i++) {
+                                                                // Dùng class "far" của Font Awesome cho sao rỗng
+                                                                echo '<i class="far fa-star"></i>';
+                                                            }
+                                                        ?>
                                                     </div>
-                                                    <p>(<span>120</span> Review)</p>
+                                                    <p>(<span><?php echo $book['SoLuotMua'];?></span></span> Review)</p>
                                                 </div>
                                                 <div class="price">
-                                                    <span>$50</span>
+                                                    <span><?php 
+                                                    
+                                                    echo formatPriceToK($book['GiaBan']); ?></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <?php }?>
                             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                                 <div class="properties pb-30">
                                     <div class="properties-card">

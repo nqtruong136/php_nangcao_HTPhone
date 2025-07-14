@@ -38,6 +38,94 @@ class MasterModel
     }
 
 
+
+    public function get_book_all_by_date_6b()
+    {  $select = <<<SQL
+        SELECT
+            s.MaSach,
+            s.TenSach,
+            s.AnhBia,
+            s.GiaBan,
+            COALESCE(AVG(d.DiemXepHang), 0) AS DiemTrungBinh,
+            COUNT(d.MaDanhGia) AS TongLuotDanhGia,
+            -- SỬA LỖI: Thêm DISTINCT để chỉ lấy các tên tác giả duy nhất
+            GROUP_CONCAT(DISTINCT tg.HoTen SEPARATOR ', ') AS CacTacGia,
+            (
+                SELECT COALESCE(SUM(ctdh.SoLuong), 0)
+                FROM chitietdonhang AS ctdh
+                WHERE ctdh.MaSach = s.MaSach
+            ) AS SoLuotMua
+        FROM
+            sach AS s
+        LEFT JOIN
+            danhgiasanpham AS d ON s.MaSach = d.MaSach
+        LEFT JOIN
+            nhaxuatban AS nxb ON s.MaNXB = nxb.MaNXB
+        LEFT JOIN
+            sach_tacgia AS st ON s.MaSach = st.MaSach
+        LEFT JOIN
+            nguoidung AS tg ON st.MaTacGia = tg.MaNguoiDung
+        GROUP BY
+            s.MaSach, s.TenSach, s.AnhBia, s.GiaBan
+        ORDER BY
+            s.MaSach DESC
+        LIMIT 6;
+    SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
+    public function get_best_selling_books() // Đổi tên hàm cho rõ nghĩa
+    {
+        $select = <<<SQL
+            SELECT
+                s.MaSach,
+                s.TenSach,
+                s.AnhBia,
+                s.GiaBan,
+                COALESCE(AVG(d.DiemXepHang), 0) AS DiemTrungBinh,
+                COUNT(DISTINCT d.MaDanhGia) AS TongLuotDanhGia,
+                GROUP_CONCAT(DISTINCT tg.HoTen SEPARATOR ', ') AS CacTacGia,
+                (
+                    SELECT COALESCE(SUM(ctdh.SoLuong), 0)
+                    FROM chitietdonhang AS ctdh
+                    WHERE ctdh.MaSach = s.MaSach
+                ) AS SoLuotMua
+            FROM
+                sach AS s
+            LEFT JOIN
+                danhgiasanpham AS d ON s.MaSach = d.MaSach
+            LEFT JOIN
+                nhaxuatban AS nxb ON s.MaNXB = nxb.MaNXB
+            LEFT JOIN
+                theloai AS tl ON s.MaTheLoai = tl.MaTheLoai
+            LEFT JOIN
+                sach_tacgia AS st ON s.MaSach = st.MaSach
+            LEFT JOIN
+                nguoidung AS tg ON st.MaTacGia = tg.MaNguoiDung
+            GROUP BY
+                s.MaSach
+            -- THAY ĐỔI (1): Sắp xếp theo số lượt mua giảm dần
+            ORDER BY
+                SoLuotMua DESC
+            -- THAY ĐỔI (2): Giới hạn chỉ lấy 7 kết quả
+            LIMIT 7;
+        SQL;
+        
+        $db = self::getDB();
+        $stmt=$db->getlist($select);
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
+
+
+
     public function get_book_all_by_date()
     {  $select = <<<SQL
         SELECT

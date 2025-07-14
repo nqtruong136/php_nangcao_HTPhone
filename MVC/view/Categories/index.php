@@ -11,6 +11,18 @@
         </div>
     </div>
 </div>
+<?php
+    function formatPriceToK($price) {
+        // Nếu giá tiền lớn hơn hoặc bằng 1000
+        if ($price >= 1000) {
+            // Chia cho 1000, làm tròn xuống và thêm chữ 'K'
+            return floor($price / 1000) . 'K';
+        }
+        
+        // Nếu nhỏ hơn 1000, giữ nguyên
+        return $price;
+    }
+    ?>
 <!--  Hero area End -->
 <!-- listing Area Start -->
 <div class="listing-area pt-50 pb-50">
@@ -172,7 +184,7 @@
                                     <div class="properties pb-30">
                                         <div class="properties-card">
                                             <div class="properties-img">
-                                                <a href="book-details.html"><img src="assets/img/gallery/anhphp/<?php echo $book['AnhBia']; ?>" alt=""></a>
+                                                <a href="?controller=Details&action=index&id=<?php echo $book['MaSach']; ?>"><img src="assets/img/gallery/anhphp/<?php echo $book['AnhBia']; ?>" alt=""></a>
                                             </div>
                                             <div class="properties-caption properties-caption2">
                                                 <h3><a href="?controller=Details&action=index&id=<?php echo $book['MaSach']; ?>"><?php echo $book['TenSach']; ?></a></h3>
@@ -208,11 +220,12 @@
                                                                 echo '<i class="far fa-star"></i>';
                                                             }
                                                             ?>
-                                                            <p>(<span><?php echo $book['SoLuotMua'];?></span></span> Review)</p>
+                                                            
                                                         </div>
+                                                        <p>(<span><?php echo $book['SoLuotMua'];?></span></span> Review)</p>
                                                     </div>
                                                     <div class="price">
-                                                        <span><?php echo number_format($book['GiaBan'], 0, ',', '.'); ?> VNĐ</span>
+                                                        <span><?php echo formatPriceToK($book['GiaBan']); ?></span>
                                                     </div>
                                                 </div>
                                             </div>

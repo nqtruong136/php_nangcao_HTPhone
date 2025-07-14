@@ -8,6 +8,18 @@ class MasterController {
         
     }
 
+
+
+    public function formatPriceToK($price) {
+        // Nếu giá tiền lớn hơn hoặc bằng 1000
+        if ($price >= 1000) {
+            // Chia cho 1000, làm tròn xuống và thêm chữ 'K'
+            return floor($price / 1000) . 'K';
+        }
+        
+        // Nếu nhỏ hơn 1000, giữ nguyên
+        return $price;
+    }
     // Phương thức render view
     protected function render($view, $data = []) {
         // Chuyển đổi mảng data thành các biến để sử dụng trong view

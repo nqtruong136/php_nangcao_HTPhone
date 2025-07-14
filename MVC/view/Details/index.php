@@ -33,7 +33,7 @@
                                         <p>(<?php echo $data1['SoLuotMua']; ?> Review)</p>
                                     </div> 
                                     <div class="d-flex align-items-center">
-                                        <form action="?controller=Cart&action=addCart" method="post">
+                                        <form id="addToCartForm" method="post">
                                             <input type="hidden" name="id" value="<?php echo $data1['MaSach']; ?>">
                                             <input type="hidden" name="name" value="<?php echo $data1['TenSach']; ?>">
                                             <input type="hidden" name="price" value="<?php echo $data1['GiaBan']; ?>">
@@ -269,3 +269,24 @@
     </section>
     <!-- Subscribe Area End -->
 </main>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('#addToCartForm').on('submit', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '?controller=Cart&action=addCartAjax',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response){
+                alert('Product added to cart successfully!');
+                var $cartIcon = $('.shopping-card');
+                $cartIcon.attr('data-count', response.cart_count);
+                // Force reflow/repaint to ensure CSS pseudo-element updates
+                $cartIcon.addClass('force-repaint').removeClass('force-repaint');
+            }
+        });
+    });
+});
+</script>

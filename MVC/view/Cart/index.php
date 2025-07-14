@@ -61,7 +61,7 @@
                                                 <h5><?php echo number_format($total, 0); ?>VND</h5>
                                             </td>
                                             <td>
-                                                <a href="?controller=Cart&action=removeItem&id=<?php echo $item['id']; ?>" class="btn"><i class="fas fa-trash-alt"></i></a>
+                                                <a href="?controller=Cart&action=removeItem&id=<?php echo $item['id']; ?>" class="btn remove-item-btn" data-id="<?php echo $item['id']; ?>"><i class="fas fa-trash-alt"></i></a>
                                             </td>
                                         </tr>
                                 <?php
@@ -70,7 +70,7 @@
                                 ?>
                                 <tr class="bottom_button">
                                     <td>
-                                        <button class="btn" type="submit">Update Cart</button>
+                                        <button class="btn update-cart-btn" type="button">Update Cart</button>
                                     </td>
                                     <td></td>
                                     <td></td>
@@ -97,7 +97,44 @@
                         <a class="btn checkout_btn" href="#">Proceed to checkout</a>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
 </main>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.update-cart-btn').on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '?controller=Cart&action=updateCart',
+            data: $('form').serialize(),
+            dataType: 'json',
+            success: function(response){
+                var $cartIcon = $('.shopping-card');
+                $cartIcon.attr('data-count', response.cart_count);
+                $cartIcon.addClass('force-repaint').removeClass('force-repaint');
+                location.reload();
+            }
+        });
+    });
+
+    $('.remove-item-btn').on('click', function(e){
+        e.preventDefault();
+        var id = $(this).data('id');
+        $.ajax({
+            type: 'GET',
+            url: '?controller=Cart&action=removeItem&id=' + id,
+            dataType: 'json',
+            success: function(response){
+                var $cartIcon = $('.shopping-card');
+                $cartIcon.attr('data-count', response.cart_count);
+                $cartIcon.addClass('force-repaint').removeClass('force-repaint');
+                location.reload();
+            }
+        });
+    });
+});
+</script>

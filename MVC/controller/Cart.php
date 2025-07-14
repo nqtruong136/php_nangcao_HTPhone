@@ -43,7 +43,8 @@ class Cart extends MasterController
         if (isset($_SESSION['cart'][$id])) {
             unset($_SESSION['cart'][$id]);
         }
-        echo "<script>window.location.href = '?controller=Details&action=index&id={$_SESSION['cart']['id']}';</script>";
+        header('Content-Type: application/json');
+        echo json_encode(['cart_count' => isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0]);
         exit();
     }
 
@@ -58,7 +59,32 @@ class Cart extends MasterController
                 }
             }
         }
-        echo "<script>window.location.href = '?controller=Cart&action=index';</script>";
+        header('Content-Type: application/json');
+        echo json_encode(['cart_count' => isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0]);
+        exit();
+    }
+
+    public function addCartAjax()
+    {
+        $id = $_POST["id"];
+        $name = $_POST["name"];
+        $price = $_POST["price"];
+        $img = $_POST["img"];
+        $quantity = (isset($_POST["quantity"]) && $_POST["quantity"] > 0) ? $_POST["quantity"] : 1;
+
+        if (isset($_SESSION["cart"][$id])) {
+            $_SESSION["cart"][$id]["quantity"] += $quantity;
+        } else {
+            $_SESSION["cart"][$id] = array(
+                "id" => $id,
+                "name" => $name,
+                "price" => $price,
+                "img" => $img,
+                "quantity" => $quantity
+            );
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['cart_count' => count($_SESSION['cart'])]);
         exit();
     }
 

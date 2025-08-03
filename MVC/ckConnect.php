@@ -1,9 +1,9 @@
 <?php
 
-$host = '172.25.173.248'; // hoặc localhost nếu máy của bạn
-$dbname = 'mvc_book';
-$user = 'guest'; // hoặc user bạn tạo cho bạn của mình
-$pass = 'gt123';     // mật khẩu
+$host = 'sql12.freesqldatabase.com'; // hoặc localhost nếu máy của bạn
+$dbname = 'sql12793370';
+$user = 'sql12793370'; // hoặc user bạn tạo cho bạn của mình
+$pass = 'CuTRfhUiCA';     // mật khẩu
 $port = 3306;   // nếu không phải cổng mặc định thì sửa lại
 $start = microtime(true);
 try {

@@ -9,25 +9,25 @@ class Cart extends MasterController
 
     public function addCart()
     {
-        $id = $_POST["id"];
-        $name = $_POST["name"];
-        $price = $_POST["price"];
-        $img = $_POST["img"];
-        $quantity = (isset($_POST["quantity"]) && $_POST["quantity"] > 0) ? $_POST["quantity"] : 1;
+        // $id = $_POST["id"];
+        // $name = $_POST["name"];
+        // $price = $_POST["price"];
+        // $img = $_POST["img"];
+        // $quantity = (isset($_POST["quantity"]) && $_POST["quantity"] > 0) ? $_POST["quantity"] : 1;
 
-        if (isset($_SESSION["cart"][$id])) {
-            $_SESSION["cart"][$id]["quantity"] += $quantity;
-        } else {
-            $_SESSION["cart"][$id] = array(
-                "id" => $id,
-                "name" => $name,
-                "price" => $price,
-                "img" => $img,
-                "quantity" => $quantity
-            );
-        }
-        echo "<script>window.location.href = '?controller=Details&action=index&id=$id';</script>";
-        exit();
+        // if (isset($_SESSION["cart"][$id])) {
+        //     $_SESSION["cart"][$id]["quantity"] += $quantity;
+        // } else {
+        //     $_SESSION["cart"][$id] = array(
+        //         "id" => $id,
+        //         "name" => $name,
+        //         "price" => $price,
+        //         "img" => $img,
+        //         "quantity" => $quantity
+        //     );
+        // }
+        // echo "<script>window.location.href = '?controller=Details&action=index&id=$id';</script>";
+        // exit();
     }
     
     public function clearCart()

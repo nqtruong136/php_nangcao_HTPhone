@@ -31,6 +31,9 @@ switch($controller){
     case 'Checkout':
         $controller = new Checkout();
         break;
+    case 'Service':
+        $controller = new Service();
+        break;
     default:
         $controller = new Home();
         break;

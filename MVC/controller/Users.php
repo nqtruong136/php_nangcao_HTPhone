@@ -20,7 +20,7 @@ class Users extends MasterController
     public function confirmLogin()
     {
 
-        //var_dump($_POST);
+        /*//var_dump($_POST);
         // Kiểm tra xem người dùng có gửi dữ liệu từ form lên không
         if (isset($_POST['username']) && isset($_POST['password'])) {
             // Lấy dữ liệu từ form
@@ -53,7 +53,7 @@ class Users extends MasterController
             // thì chỉ cần render form ra.
             // Không nên hiển thị "Login Failed" ở đây vì người dùng chưa thử đăng nhập.
             $this->render('Authentication/Login');
-        }
+        }*/
 
     }
     

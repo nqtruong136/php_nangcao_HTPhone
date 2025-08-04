@@ -63,7 +63,7 @@
       <div class="container">
         <div class="main-header">
           <div class="header-left">
-            <div class="header-logo"><a class="d-flex" href="index.html"><img alt="Ecom" src="assets/imgs/template/logo.svg"></a></div>
+            <div class="header-logo"><a class="d-flex" href="?"><img alt="Ecom" src="assets/imgs/template/logo.svg"></a></div>
             <div class="header-search">
               <div class="box-header-search">
                 <form class="form-search" method="post" action="#">
@@ -90,7 +90,7 @@
             <div class="header-nav">
               <nav class="nav-main-menu d-none d-xl-block">
                 <ul class="main-menu">
-                  <li class="has-children"><a class="active" href="index.html">Home</a>
+                  <li class="has-children"><a class="active" href="?">Home</a>
                     <ul class="sub-menu two-col">
                       <li><a href="index.html">Homepage - 1</a></li>
                       <li><a href="index-2.html">Homepage - 2</a></li>
@@ -104,7 +104,7 @@
                       <li><a href="index-10.html">Homepage - 10</a></li>
                     </ul>
                   </li>
-                  <li class="has-children"><a href="shop-grid.html">Shop</a>
+                  <li class="has-children"><a href="?controller=Books&action=index">Shop</a>
                     <ul class="sub-menu two-col">
                       <li><a href="shop-grid.html">Shop Grid</a></li>
                       <li><a href="shop-grid-2.html">Shop Grid 2</a></li>
@@ -129,16 +129,16 @@
                   </li>
                   <li class="has-children"><a href="#">Pages</a>
                     <ul class="sub-menu">
-                      <li><a href="page-about-us.html">About Us</a></li>
-                      <li><a href="page-contact.html">Contact Us</a></li>
-                      <li><a href="page-careers.html">Careers</a></li>
-                      <li><a href="page-term.html">Term and Condition</a></li>
-                      <li><a href="page-register.html">Register</a></li>
-                      <li><a href="page-login.html">Login</a></li>
-                      <li><a href="page-404.html">Error 404</a></li>
+                      <li><a href="?controller=About&action=index">About Us</a></li>
+                      <li><a href="?controller=Contact&action=index">Contact Us</a></li>
+                      <li><a href="?controller=Service&action=Career">Careers</a></li>
+                      <li><a href="?controller=Service&action=Term">Term and Condition</a></li>
+                      <li><a href="?controller=Users&action=Register">Register</a></li>
+                      <li><a href="?controller=Users&action=Login">Login</a></li>
+                      
                     </ul>
                   </li>
-                  <li class="has-children"><a href="blog.html">Blog</a>
+                  <li class="has-children"><a href="?controller=Blog&action=index">Blog</a>
                     <ul class="sub-menu">
                       <li><a href="blog.html">Blog - No Sidebar</a></li>
                       <li><a href="blog-2.html">Blog - Right Sidebar</a></li>
@@ -149,7 +149,7 @@
                       <li><a href="blog-single-3.html">Blog Single - No sidebar</a></li>
                     </ul>
                   </li>
-                  <li><a href="page-contact.html">Contact Us</a></li>
+                  <li><a href="?controller=Contact&action=index">Contact Us</a></li>
                 </ul>
               </nav>
               <div class="burger-icon burger-icon-white"><span class="burger-icon-top"></span><span class="burger-icon-mid"></span><span class="burger-icon-bottom"></span></div>

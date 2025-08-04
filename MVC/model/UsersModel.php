@@ -12,7 +12,7 @@ if (class_exists('Users')) {
 
 class UsersModel extends MasterModel
 {
-    public function validateLogin($username, $password, $keep_log)
+    /*public function validateLogin($username, $password, $keep_log)
     {
         $db = self::getDB();
         $password = md5($password);
@@ -56,6 +56,6 @@ class UsersModel extends MasterModel
         catch(PDOException $e){
             echo "Lỗi: " . $e->getMessage();
         }
-    }
+    }*/
 }
 ?>

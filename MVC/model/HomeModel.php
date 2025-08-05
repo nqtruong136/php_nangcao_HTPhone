@@ -15,12 +15,18 @@ class HomeModel extends MasterModel
     {
         
     }
-    public function get_2section_book(){
-        $data1 = parent::get_best_selling_books();
-        $data2 = parent::get_book_all_by_date_6b();
+    public function get_5section_book(){
+        $data1 = parent::get_phone_best_seller();
+        $data2 = parent::get_phone_last_deals();
+        $data3 = parent::get_phone_trend_week();
+        $data4 = parent::get_phone_topselling();
+        $data5 = parent::get_phone_last_newBlog();
         $data=[
-            'data1' => $data1,
-            'data2' => $data2
+            'data_best_seller' => $data1,
+            'data_last_deals' => $data2,
+            'data_trend_week' => $data3,
+            'data_topselling' => $data4,
+            'data_last_newBlog' => $data5
         ];
         return $data;
         

@@ -10,6 +10,57 @@
         // Nếu nhỏ hơn 1000, giữ nguyên
         return $price;
     }
+
+    function render_product_card($product) {
+        $formattedPrice = formatPriceToK($product['GiaHienThi']);
+        $rating = round($product['DiemTrungBinh']);
+        $stars = '';
+        for ($i = 0; $i < 5; $i++) {
+            if ($i < $rating) {
+                $stars .= '<img src="assets/imgs/template/icons/star.svg" alt="Ecom">';
+            }
+        }
+
+        $discountLabel = '';
+        if (isset($product['GiaGoc']) && isset($product['GiaKhuyenMai']) && $product['GiaGoc'] > $product['GiaKhuyenMai']) {
+            $percentage = round((($product['GiaGoc'] - $product['GiaKhuyenMai']) / $product['GiaGoc']) * 100);
+            $discountLabel = "<span class=\"label bg-brand-2\">-{$percentage}%</span>";
+        }
+
+        echo <<<HTML
+        <div class="card-grid-style-3">
+          <div class="card-grid-inner">
+            <div class="tools">
+                <a class="btn btn-trend btn-tooltip mb-10" href="#" aria-label="Trend" data-bs-placement="left"></a>
+                <a class="btn btn-wishlist btn-tooltip mb-10" href="shop-wishlist.html" aria-label="Add To Wishlist"></a>
+                <a class="btn btn-compare btn-tooltip mb-10" href="shop-compare.html" aria-label="Compare"></a>
+                <a class="btn btn-quickview btn-tooltip" aria-label="Quick view" href="#ModalQuickview" data-bs-toggle="modal"></a>
+            </div>
+            <div class="image-box">
+                {$discountLabel}
+                <a href="?url=Details/index/{$product['MaSanPham']}">
+                    <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
+                </a>
+            </div>
+            <div class="info-right">
+                <a class="font-xs color-gray-500" href="shop-vendor-single.html">{$product['TenNhaCungCap']}</a>
+                <br>
+                <a class="color-brand-3 font-sm-bold" href="?url=Details/index/{$product['MaSanPham']}">{$product['TenSanPham']}</a>
+                <div class="rating">
+                    {$stars}
+                    <span class="font-xs color-gray-500">({$product['TongLuotDanhGia']})</span>
+                </div>
+                <div class="price-info">
+                    <strong class="font-lg-bold color-brand-3 price-main">{$formattedPrice}</strong>
+                </div>
+                <div class="mt-20 box-btn-cart">
+                    <a class="btn btn-cart" href="shop-cart.html">Add To Cart</a>
+                </div>
+            </div>
+          </div>
+        </div>
+HTML;
+    }
     ?>
     <main class="main">
       <section class="section-box">
@@ -274,6 +325,11 @@
           <div class="tab-content">
             <div class="tab-pane fade active show" id="tab-all" role="tabpanel" aria-labelledby="tab-all">
               <div class="list-products-5">
+                <?php
+                foreach ($data['data_best_seller'] as $item) {
+                    // Hiển thị sản phẩm
+                
+                ?>
                 <div class="card-grid-style-3">
                   <div class="card-grid-inner">
                     <div class="tools"><a class="btn btn-trend btn-tooltip mb-10" href="#" aria-label="Trend" data-bs-placement="left"></a><a class="btn btn-wishlist btn-tooltip mb-10" href="shop-wishlist.html" aria-label="Add To Wishlist"></a><a class="btn btn-compare btn-tooltip mb-10" href="shop-compare.html" aria-label="Compare"></a><a class="btn btn-quickview btn-tooltip" aria-label="Quick view" href="#ModalQuickview" data-bs-toggle="modal"></a></div>
@@ -290,6 +346,9 @@
                     </div>
                   </div>
                 </div>
+                <?php
+                  }
+                ?>
                 <div class="card-grid-style-3">
                   <div class="card-grid-inner">
                     <div class="tools"><a class="btn btn-trend btn-tooltip mb-10" href="#" aria-label="Trend" data-bs-placement="left"></a><a class="btn btn-wishlist btn-tooltip mb-10" href="shop-wishlist.html" aria-label="Add To Wishlist"></a><a class="btn btn-compare btn-tooltip mb-10" href="shop-compare.html" aria-label="Compare"></a><a class="btn btn-quickview btn-tooltip" aria-label="Quick view" href="#ModalQuickview" data-bs-toggle="modal"></a></div>

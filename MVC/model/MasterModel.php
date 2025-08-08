@@ -7,7 +7,7 @@ class MasterModel
     protected static function getDB()
     {
         if (self::$db === null) {
-            self::$db = new Connect();
+            self::$db = Connect::getInstance();
         }
         return self::$db;
     }
@@ -270,35 +270,76 @@ class MasterModel
             s.MaSanPham,
             s.TenSanPham,
             s.AnhDaiDien,
+            s.NgayRaMat,
             ncc.TenNhaCungCap,
-            -- Lấy giá thấp nhất trong các biến thể, ưu tiên giá khuyến mãi
-            MIN(COALESCE(bt.GiaKhuyenMai, bt.GiaGoc)) AS GiaHienThi,
-            -- Tính điểm đánh giá trung bình, nếu chưa có đánh giá thì là 0
-            COALESCE(AVG(r.SoSao), 0) AS DiemTrungBinh,
-            -- Đếm tổng số lượt đánh giá
-            COUNT(DISTINCT r.MaReview) AS TongLuotDanhGia,
-            -- Tính tổng số lượt bán của tất cả các biến thể thuộc sản phẩm này
-            SUM(bt.SoLuotBan) AS TongSoLuotBan
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
+            bt.SoLuotBan,
+            tsk.ManHinhRong,
+            tsk.ChipXuLy,
+            tsk.RAM,
+            
+            -- Dùng subquery để lấy điểm đánh giá chung cho dòng sản phẩm
+            (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
         FROM
-            SanPhams AS s
+            SanPham_BienThe AS bt
+        INNER JOIN
+            SanPhams AS s ON bt.MaSanPham = s.MaSanPham
         LEFT JOIN
-            -- Join với bảng biến thể để lấy giá và số lượt bán
-            SanPham_BienThe AS bt ON s.MaSanPham = bt.MaSanPham
-        LEFT JOIN
-            -- Join với bảng đánh giá để lấy thông tin rating
-            Reviews AS r ON s.MaSanPham = r.MaSanPham
-        LEFT JOIN
-            -- Join với nhà cung cấp để lấy tên thương hiệu
             NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
-        -- Chỉ lấy các sản phẩm có tồn tại biến thể để tránh lỗi
-        WHERE
-            bt.MaBienThe IS NOT NULL
-        GROUP BY
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap
+        LEFT JOIN
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
         ORDER BY
-            -- Sắp xếp theo tổng số lượt bán giảm dần
-            TongSoLuotBan DESC
-        -- Giới hạn số lượng sản phẩm hiển thị (ví dụ: 8 sản phẩm)
+            -- Sắp xếp theo số lượt bán của từng biến thể
+            bt.SoLuotBan DESC
+        LIMIT 8;
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function get_phone_last_deals()
+    {
+        $select = <<<SQL
+        SELECT
+            s.MaSanPham,
+            s.TenSanPham,
+            s.AnhDaiDien,
+            s.DacDiemNoiBat, -- Lấy ra đặc điểm nổi bật đã thêm
+            ncc.TenNhaCungCap,
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
+            SUM(ctdh.SoLuong) AS SoLuongBanTrongThang,
+            -- Dùng subquery để lấy điểm đánh giá chung cho dòng sản phẩm
+            (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
+        FROM
+            ChiTietDonHangs AS ctdh
+        INNER JOIN
+            DonHangs AS dh ON ctdh.MaDonHang = dh.MaDonHang
+        INNER JOIN
+            SanPham_BienThe AS bt ON ctdh.MaBienThe = bt.MaBienThe
+        INNER JOIN
+            SanPhams AS s ON bt.MaSanPham = s.MaSanPham
+        LEFT JOIN
+            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        WHERE
+            -- Chỉ lấy các đơn hàng được đặt trong tháng và năm hiện tại
+            MONTH(dh.NgayDat) = MONTH(CURDATE())
+            AND YEAR(dh.NgayDat) = YEAR(CURDATE())
+        GROUP BY
+            -- Nhóm theo từng biến thể cụ thể
+            bt.MaBienThe, s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap, bt.DungLuong, bt.MauSac, bt.GiaGoc, bt.GiaKhuyenMai, s.DacDiemNoiBat
+        ORDER BY
+            -- Sắp xếp theo tổng số lượng bán trong tháng giảm dần
+            SoLuongBanTrongThang DESC
         LIMIT 8;
         SQL;
         $db = self::getDB();
@@ -313,74 +354,38 @@ class MasterModel
             s.TenSanPham,
             s.AnhDaiDien,
             ncc.TenNhaCungCap,
-            MIN(COALESCE(bt.GiaKhuyenMai, bt.GiaGoc)) AS GiaHienThi,
-            -- Tính tổng số lượng bán ra chỉ trong tháng này
-            SUM(ctdh.SoLuong) AS SoLuongBanTrongThang
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
+            SUM(ctdh.SoLuong) AS SoLuongBanTrongThang,
+            -- Dùng subquery để lấy điểm đánh giá chung cho dòng sản phẩm
+            (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
         FROM
             ChiTietDonHangs AS ctdh
         INNER JOIN
-            -- Join với bảng đơn hàng để lấy ngày đặt
             DonHangs AS dh ON ctdh.MaDonHang = dh.MaDonHang
         INNER JOIN
-            -- Join với các bảng khác để lấy thông tin sản phẩm
             SanPham_BienThe AS bt ON ctdh.MaBienThe = bt.MaBienThe
         INNER JOIN
             SanPhams AS s ON bt.MaSanPham = s.MaSanPham
         LEFT JOIN
             NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
         WHERE
-            -- **Điều kiện cốt lõi:** Chỉ lấy các đơn hàng được đặt trong tháng và năm hiện tại
+            -- Chỉ lấy các đơn hàng được đặt trong tháng và năm hiện tại
             MONTH(dh.NgayDat) = MONTH(CURDATE())
             AND YEAR(dh.NgayDat) = YEAR(CURDATE())
         GROUP BY
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap
+            -- Nhóm theo từng biến thể cụ thể
+            bt.MaBienThe, s.MaSanPham
         ORDER BY
             -- Sắp xếp theo tổng số lượng bán trong tháng giảm dần
             SoLuongBanTrongThang DESC
-        LIMIT 8;
-        SQL;
-        $db = self::getDB();
-        $result = $db->getlist($select);
-        return $result->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function get_phone_last_deals()
-    {
-        $select = <<<SQL
-        SELECT
-            s.MaSanPham,
-            s.TenSanPham,
-            s.AnhDaiDien,
-            ncc.TenNhaCungCap,
-            -- Lấy giá gốc và giá khuyến mãi của biến thể có deal tốt nhất (giảm nhiều nhất)
-            bt.GiaGoc,
-            bt.GiaKhuyenMai,
-            -- Tính phần trăm giảm giá để hiển thị
-            ROUND(((bt.GiaGoc - bt.GiaKhuyenMai) / bt.GiaGoc) * 100) AS PhanTramGiam,
-            -- Tính điểm đánh giá trung bình
-            COALESCE(AVG(r.SoSao), 0) AS DiemTrungBinh
-        FROM
-            SanPham_BienThe AS bt
-        INNER JOIN
-            -- Join với bảng sản phẩm gốc
-            SanPhams AS s ON bt.MaSanPham = s.MaSanPham
-        LEFT JOIN
-            -- Join với nhà cung cấp để lấy tên thương hiệu
-            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
-        LEFT JOIN
-            -- Join với bảng đánh giá để lấy thông tin rating
-            Reviews AS r ON s.MaSanPham = r.MaSanPham
-        WHERE
-            -- **Điều kiện cốt lõi:** Chỉ lấy những biến thể đang có khuyến mãi
-            bt.GiaKhuyenMai IS NOT NULL AND bt.GiaKhuyenMai > 0
-        GROUP BY
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap, bt.GiaGoc, bt.GiaKhuyenMai
-        ORDER BY
-            -- Sắp xếp ưu tiên theo ngày ra mắt mới nhất để deal của sản phẩm mới được hiển thị trước
-            s.NgayRaMat DESC,
-            -- Nếu cùng ngày ra mắt, ưu tiên deal có phần trăm giảm giá cao hơn
-            PhanTramGiam DESC
-        -- Giới hạn số lượng deal hiển thị
-        LIMIT 8;
+        -- Lấy 12 sản phẩm để chia thành 2 slide, mỗi slide 6 sản phẩm
+        LIMIT 12;
+
         SQL;
         $db = self::getDB();
         $result = $db->getlist($select);
@@ -393,30 +398,41 @@ class MasterModel
             s.MaSanPham,
             s.TenSanPham,
             s.AnhDaiDien,
+            s.DacDiemNoiBat,
             ncc.TenNhaCungCap,
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
             s.SoLuotXem,
-            -- Lấy giá thấp nhất trong các biến thể
-            MIN(COALESCE(bt.GiaKhuyenMai, bt.GiaGoc)) AS GiaHienThi,
-            -- Tính tổng số lượng bán ra chỉ trong tuần này
+            -- Thêm các cột thông số kỹ thuật
+            tsk.ManHinhRong,
+            tsk.ChipXuLy,
+            tsk.RAM,
+            -- Tính tổng số lượng bán ra chỉ trong 7 ngày qua
             COALESCE(SUM(CASE WHEN dh.NgayDat >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) THEN ctdh.SoLuong ELSE 0 END), 0) AS SoLuongBanTrongTuan,
-            -- Tính điểm xu hướng dựa trên công thức đề xuất
-            (s.SoLuotXem + (COALESCE(SUM(CASE WHEN dh.NgayDat >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) THEN ctdh.SoLuong ELSE 0 END), 0) * 50)) AS DiemXuHuong
+            -- Tính điểm xu hướng dựa trên công thức
+            (s.SoLuotXem + (COALESCE(SUM(CASE WHEN dh.NgayDat >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) THEN ctdh.SoLuong ELSE 0 END), 0) * 50)) AS DiemXuHuong,
+            -- Dùng subquery để lấy điểm đánh giá chung cho dòng sản phẩm
+            (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
         FROM
-            SanPhams AS s
+            SanPham_BienThe AS bt
+        INNER JOIN
+            SanPhams AS s ON bt.MaSanPham = s.MaSanPham
         LEFT JOIN
-            -- Join với biến thể để lấy thông tin sản phẩm chi tiết
-            SanPham_BienThe AS bt ON s.MaSanPham = bt.MaSanPham
-        LEFT JOIN
-            -- Join với chi tiết đơn hàng
+            -- Join với đơn hàng để tính toán doanh số trong tuần
             ChiTietDonHangs AS ctdh ON bt.MaBienThe = ctdh.MaBienThe
         LEFT JOIN
-            -- Join với đơn hàng để lấy ngày đặt
             DonHangs AS dh ON ctdh.MaDonHang = dh.MaDonHang
         LEFT JOIN
-            -- Join với nhà cung cấp
             NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN
+            -- **THÊM MỚI**: Join với bảng thông số kỹ thuật
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
         GROUP BY
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap, s.SoLuotXem
+            bt.MaBienThe, tsk.ManHinhRong, tsk.ChipXuLy, tsk.RAM -- **CẬP NHẬT**: Thêm các cột mới vào GROUP BY
         ORDER BY
             -- Sắp xếp theo điểm xu hướng giảm dần
             DiemXuHuong DESC
@@ -430,26 +446,228 @@ class MasterModel
     {
         $select = <<<SQL
         SELECT
-            b.MaBlog,
-            b.TieuDe,
-            b.AnhDaiDien,
-            b.NgayDang,
-            b.TheLoai,
-            b.ThoiGianDoc,
-            u.TenUser AS TenTacGia
+            MaBlog,
+            TieuDe,
+            AnhDaiDien,
+            NgayDang,
+            TheLoai,
+            ThoiGianDoc
         FROM
-            Blogs AS b
-        LEFT JOIN
-            -- Join với bảng Users để lấy tên tác giả
-            Users AS u ON b.MaUser = u.MaUser
+            Blogs
         ORDER BY
             -- Sắp xếp theo ngày đăng mới nhất để đưa bài mới lên đầu
-            b.NgayDang DESC
-        -- Giới hạn chỉ lấy 3 bài viết mới nhất để hiển thị trên trang chủ
-        LIMIT 3;
+            NgayDang DESC
+        -- Giới hạn số lượng bài viết hiển thị trong slider
+        LIMIT 5;
+
         SQL;
         $db = self::getDB();
         $result = $db->getlist($select);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getMainProductInfo($id)
+    {
+        $select = <<<SQL
+        SELECT
+            s.*, -- Lấy tất cả cột từ bảng SanPhams
+            ncc.TenNhaCungCap,
+            ncc.LogoURL,
+            c.TenCategory,
+            tsk.* -- Lấy tất cả cột từ bảng ThongSoKyThuat
+        FROM
+            SanPhams AS s
+        LEFT JOIN
+            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN
+            Categories AS c ON s.MaCategory = c.MaCategory
+        LEFT JOIN
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
+        WHERE
+            s.MaSanPham = ?; -- Dấu ? sẽ được thay bằng ID sản phẩm
+
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select, [$id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getVariants($id)
+    {
+        $select = <<<SQL
+        SELECT
+            *
+        FROM
+            SanPham_BienThe
+        WHERE
+            MaSanPham = ?
+        ORDER BY
+            MauSac, DungLuong;
+
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select, [$id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getGalleryImages($id)
+    {
+        $select = <<<SQL
+        SELECT
+            URL_Anh
+        FROM
+            AnhSanPham
+        WHERE
+            MaSanPham = ?;
+
+
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select, [$id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function full4tab($id)
+    {
+        $select = <<<SQL
+        SELECT
+            -- Dữ liệu cho tab "Description"
+            s.MoTaChiTiet,
+            -- Dữ liệu cho tab "Vendor"
+            ncc.TenNhaCungCap,
+            ncc.LogoURL,
+            ncc.Website,
+            -- Dữ liệu cho tab "Specification" và "Additional Information"
+            tsk.*
+        FROM
+            SanPhams AS s
+        LEFT JOIN
+            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
+        WHERE
+            s.MaSanPham = ?; -- Thay ? bằng ID sản phẩm, ví dụ: 1
+
+
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select, [$id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function Review_product($id)
+    {
+        $select = <<<SQL
+        -- Lấy tất cả đánh giá của một sản phẩm, kèm tên người dùng
+        SELECT
+            r.SoSao,
+            r.NoiDung,
+            u.TenUser
+        FROM
+            Reviews AS r
+        INNER JOIN
+            Users AS u ON r.MaUser = u.MaUser
+        WHERE
+            r.MaSanPham = ? -- Thay ? bằng ID sản phẩm
+        ORDER BY
+            r.MaReview DESC; -- Sắp xếp theo review mới nhất
+
+
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select, [$id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function star_comment_product($id)
+    {
+        $select = <<<SQL
+        SELECT
+            COUNT(MaReview) AS TongSoDanhGia,
+            COALESCE(ROUND(AVG(SoSao), 1), 0) AS DiemTrungBinh,
+            SUM(CASE WHEN SoSao = 5 THEN 1 ELSE 0 END) AS SoLuong5Sao,
+            SUM(CASE WHEN SoSao = 4 THEN 1 ELSE 0 END) AS SoLuong4Sao,
+            SUM(CASE WHEN SoSao = 3 THEN 1 ELSE 0 END) AS SoLuong3Sao,
+            SUM(CASE WHEN SoSao = 2 THEN 1 ELSE 0 END) AS SoLuong2Sao,
+            SUM(CASE WHEN SoSao = 1 THEN 1 ELSE 0 END) AS SoLuong1Sao
+        FROM
+            Reviews
+        WHERE
+            MaSanPham = ?; -- Thay ? bằng ID sản phẩm
+
+
+        SQL;
+        $db = self::getDB();
+        $result = $db->getlist($select, [$id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function get_related_products($category_id, $current_product_id)
+    {
+        $select = <<<SQL
+        SELECT
+            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, s.DacDiemNoiBat,
+            ncc.TenNhaCungCap, bt.MaBienThe, bt.DungLuong, bt.MauSac,
+            bt.GiaGoc, bt.GiaKhuyenMai,
+            (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
+        FROM SanPham_BienThe AS bt
+        INNER JOIN SanPhams AS s ON bt.MaSanPham = s.MaSanPham
+        LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        WHERE s.MaCategory = ? AND s.MaSanPham != ?
+        GROUP BY s.MaSanPham
+        ORDER BY s.NgayRaMat DESC
+        LIMIT 5;
+        SQL;
+        
+        $db = self::getDB();
+        
+        $result = $db->getList($select, [$category_id, $current_product_id]);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function get_you_may_also_like_products($current_product_id, $current_rating)
+    {
+        $select = <<<SQL
+        SELECT
+            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, s.DacDiemNoiBat,
+            ncc.TenNhaCungCap, bt.MaBienThe, bt.DungLuong, bt.MauSac,
+            bt.GiaGoc, bt.GiaKhuyenMai,
+            COALESCE(AVG(r.SoSao), 0) AS DiemTrungBinh,
+            COUNT(DISTINCT r.MaReview) AS TongLuotDanhGia
+        FROM SanPhams AS s
+        LEFT JOIN Reviews AS r ON s.MaSanPham = r.MaSanPham
+        LEFT JOIN SanPham_BienThe AS bt ON s.MaSanPham = bt.MaSanPham
+        LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        WHERE s.MaSanPham != ?
+        GROUP BY s.MaSanPham
+        HAVING DiemTrungBinh BETWEEN ? AND ?
+        ORDER BY s.SoLuotXem DESC
+        LIMIT 5;
+        SQL;
+
+        $db = self::getDB();
+        
+        $params = [$current_product_id, $current_rating - 0.5, $current_rating + 0.5];
+        $result = $db->getList($select, $params);
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function get_similar_products($current_product_id, $current_price)
+    {
+        $select = <<<SQL
+        SELECT
+            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, s.DacDiemNoiBat,
+            ncc.TenNhaCungCap, bt.MaBienThe, bt.DungLuong, bt.MauSac,
+            bt.GiaGoc, bt.GiaKhuyenMai,
+            (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
+        FROM SanPham_BienThe AS bt
+        INNER JOIN SanPhams AS s ON bt.MaSanPham = s.MaSanPham
+        LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        WHERE bt.GiaGoc BETWEEN ? AND ? AND s.MaSanPham != ?
+        GROUP BY s.MaSanPham
+        ORDER BY s.SoLuotXem DESC
+        LIMIT 5;
+        SQL;
+        
+        $db = self::getDB();
+        // Dùng hàm getList an toàn với 3 tham số
+        $params = [$current_price - 3000000, $current_price + 3000000, $current_product_id];
+        $result = $db->getList($select, $params);
         return $result->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -531,9 +531,7 @@ class MasterModel
             -- Dữ liệu cho tab "Description"
             s.MoTaChiTiet,
             -- Dữ liệu cho tab "Vendor"
-            ncc.TenNhaCungCap,
-            ncc.LogoURL,
-            ncc.Website,
+            ncc.*,
             -- Dữ liệu cho tab "Specification" và "Additional Information"
             tsk.*
         FROM
@@ -558,7 +556,9 @@ class MasterModel
         SELECT
             r.SoSao,
             r.NoiDung,
-            u.TenUser
+            r.ThoiGian,
+            u.TenUser,
+            u.AnhDaiDien
         FROM
             Reviews AS r
         INNER JOIN

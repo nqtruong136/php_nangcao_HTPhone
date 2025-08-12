@@ -17,12 +17,12 @@ class DetailsModel extends MasterModel
         $data1 = parent::getMainProductInfo($id);
         $data2 = parent::getVariants($id);
         $data3 = parent::getGalleryImages($id);
-        var_dump($data1);
+        self::$current_price = $data2[0]['GiaGoc'];
+        self::$category_id = $data1[0]['MaCategory'];
         $data = [
-            'TQ1' => $data1,
-            'TQ2' => $data2,
-            'TQ3' => $data3,
-            
+            'getMainProductInfo' => $data1,
+            'getVariants' => $data2,
+            'getGalleryImages' => $data3,
         ];
         return $data;
     }
@@ -30,7 +30,7 @@ class DetailsModel extends MasterModel
         $data1 = parent::full4tab($id);
         $data2 = parent::Review_product($id);
         $data3 = parent::star_comment_product($id);
-
+        self::$current_rating = $data3[0]['DiemTrungBinh'];
         $data = [
             'TabFull' => $data1,
             'ReviewTab' => $data2,
@@ -41,7 +41,17 @@ class DetailsModel extends MasterModel
     public function ProductReated($id)
     {
         self::$current_product_id = $id;
-
+        $data1 = parent::get_related_products(self::$category_id, self::$current_product_id);
+        $data2 = parent::get_you_may_also_like_products(self::$current_product_id, self::$current_rating);
+        $data3 = parent::get_similar_products(self::$current_product_id, self::$current_price);
+        $data = [
+            'RelatedProducts' => $data1,
+            'YouMayAlsoLike' => $data2,
+            'SimilarProducts' => $data3,
+        ];
+        return $data;
+    
+    
     }
 
 }

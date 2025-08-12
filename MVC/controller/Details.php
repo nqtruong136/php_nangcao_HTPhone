@@ -13,9 +13,11 @@ class Details extends MasterController
             $md = new DetailsModel();
             $data1 = $md->TongQuanChiTiet($id);
             $data2 = $md->tab4($id);
+            $data3 = $md->ProductReated($id);
             $data=[
-                'data1' => $data1,
-                'data2' => $data2,
+                'TongQuanChiTiet' => $data1,
+                'tab4' => $data2,
+                'ProductReated' => $data3,
             ];
             //var_dump($data);
             $this->render('Details', $data);

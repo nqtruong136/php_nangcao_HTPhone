@@ -6,8 +6,8 @@ class Connect{
 
     //Kết nối database
     public function __construct(){ //ham khoi tao
-        $dsn='mysql:host=sql12.freesqldatabase.com;dbname=sql12793530';
-        $user='sql12793530'; $pass='fvDWVbtRFb';
+        $dsn='mysql:host=localhost;dbname=ht_phone';
+        $user='root'; $pass='';
         $this->db=new PDO($dsn,$user,$pass, array(PDO::MYSQL_ATTR_INIT_COMMAND
         => "SET NAMES utf8"));
     }

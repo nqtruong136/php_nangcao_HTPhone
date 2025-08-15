@@ -19,6 +19,7 @@ const MAX_ITEMS = 8;
  * @param {number|string} productId - ID của sản phẩm vừa được xem.
  */
 function addProductToRecentlyViewed(productId) {
+    console.log('Thêm sản phẩm vào danh sách đã xem:');
     if (!productId) {
         return; // Bỏ qua nếu không có productId
     }

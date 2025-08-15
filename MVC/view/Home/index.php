@@ -159,13 +159,13 @@ function render_product_card_best_seller($product)
         </div>
         <div class="image-box">
           {$discountLabel}
-          <a href="?url=Details/index/{$product['MaSanPham']}">
+          <a href="?controller=Details&action=index&id={$product['MaSanPham']}">
               <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
           </a>
         </div>
         <div class="info-right">
             <a class="font-xs color-gray-500" href="#">{$product['TenNhaCungCap']}</a><br>
-            <a class="color-brand-3 font-sm-bold" href="?url=Details/index/{$product['MaSanPham']}">{$tenDayDu}</a>
+            <a class="color-brand-3 font-sm-bold" href="?controller=Details&action=index&id={$product['MaSanPham']}">{$tenDayDu}</a>
             <div class="rating">
                 {$stars}
                 <span class="font-xs color-gray-500">({$product['TongLuotDanhGia']})</span>

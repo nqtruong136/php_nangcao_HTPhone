@@ -17,6 +17,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/template/favicon.svg">
   <link href="assets/css/style2513.css?v=3.0.0" rel="stylesheet">
   <title>Ecom - Ecom Marketplace Template</title>
+  <script src="assets/js/savesp.js"></script>
 </head>
 
 <body>
@@ -585,7 +586,7 @@
   <script src="assets/js/vendors/slick.js"></script>
   <script src="assets/js/main2513.js?v=3.0.0"></script>
   <script src="assets/js/shop23cd.js?v=1.2.1"></script>
-  <script src="assets/js/savesp.js"></script>
+  
   <script>
     // Nên đặt sau khi đã load jQuery và jquery.countdown.min.js
     $(document).ready(function() {

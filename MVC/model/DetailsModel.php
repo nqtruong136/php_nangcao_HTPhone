@@ -53,5 +53,37 @@ class DetailsModel extends MasterModel
     
     
     }
+    public function getProductsByIds(array $ids) {
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Tạo chuỗi placeholder (?, ?, ?) cho câu lệnh IN
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        // Câu truy vấn này lấy thông tin cần thiết cho thẻ sản phẩm kiểu đơn giản (card-grid-style-2)
+        // và sắp xếp đúng theo thứ tự ID em gửi lên bằng hàm FIELD().
+        $sql = "
+            SELECT
+                s.MaSanPham, s.TenSanPham, s.AnhDaiDien,
+                ncc.TenNhaCungCap,
+                bt.MaBienThe, bt.DungLuong, bt.GiaGoc, bt.GiaKhuyenMai,
+                (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
+                (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
+            FROM SanPhams AS s
+            JOIN SanPham_BienThe AS bt ON s.MaSanPham = bt.MaSanPham
+            LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+            WHERE s.MaSanPham IN ($placeholders)
+            GROUP BY s.MaSanPham
+            ORDER BY FIELD(s.MaSanPham, $placeholders)
+        ";
+        
+        // Gộp mảng ID 2 lần vì nó được dùng ở cả IN và FIELD
+        $params = array_merge($ids, $ids);
+
+        $db = self::getDB();
+        $stmt = $db->getList($sql, $params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 }

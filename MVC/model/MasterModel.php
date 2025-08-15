@@ -523,7 +523,7 @@ class MasterModel
         $result = $db->getlist($select, [$id]);
         return $result->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     public function full4tab($id)
     {
         $select = <<<SQL
@@ -601,22 +601,43 @@ class MasterModel
     {
         $select = <<<SQL
         SELECT
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, s.DacDiemNoiBat,
-            ncc.TenNhaCungCap, bt.MaBienThe, bt.DungLuong, bt.MauSac,
-            bt.GiaGoc, bt.GiaKhuyenMai,
+            s.MaSanPham,
+            s.TenSanPham,
+            s.AnhDaiDien,
+            s.NgayRaMat,
+            s.DacDiemNoiBat, -- Thêm cột này để khớp với hàm render
+            ncc.TenNhaCungCap,
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
+            bt.SoLuotBan,
+            tsk.ManHinhRong,
+            tsk.ChipXuLy,
+            tsk.RAM,
             (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
             (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
-        FROM SanPham_BienThe AS bt
-        INNER JOIN SanPhams AS s ON bt.MaSanPham = s.MaSanPham
-        LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
-        WHERE s.MaCategory = ? AND s.MaSanPham != ?
-        GROUP BY s.MaSanPham
-        ORDER BY s.NgayRaMat DESC
+        FROM
+            SanPham_BienThe AS bt
+        INNER JOIN
+            SanPhams AS s ON bt.MaSanPham = s.MaSanPham
+        LEFT JOIN
+            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
+        WHERE
+            -- Điều kiện vẫn được giữ nguyên: cùng danh mục và khác sản phẩm hiện tại
+            s.MaCategory = ? AND s.MaSanPham != ?
+        GROUP BY
+            s.MaSanPham -- Nhóm lại để mỗi sản phẩm chỉ xuất hiện 1 lần
+        ORDER BY
+            s.NgayRaMat DESC -- Sắp xếp theo ngày ra mắt mới nhất
         LIMIT 5;
         SQL;
-        
+
         $db = self::getDB();
-        
+
         $result = $db->getList($select, [$category_id, $current_product_id]);
         return $result->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -624,24 +645,48 @@ class MasterModel
     {
         $select = <<<SQL
         SELECT
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, s.DacDiemNoiBat,
-            ncc.TenNhaCungCap, bt.MaBienThe, bt.DungLuong, bt.MauSac,
-            bt.GiaGoc, bt.GiaKhuyenMai,
+            s.MaSanPham,
+            s.TenSanPham,
+            s.AnhDaiDien,
+            s.NgayRaMat,
+            s.DacDiemNoiBat,
+            ncc.TenNhaCungCap,
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
+            bt.SoLuotBan,
+            tsk.ManHinhRong,
+            tsk.ChipXuLy,
+            tsk.RAM,
             COALESCE(AVG(r.SoSao), 0) AS DiemTrungBinh,
             COUNT(DISTINCT r.MaReview) AS TongLuotDanhGia
-        FROM SanPhams AS s
-        LEFT JOIN Reviews AS r ON s.MaSanPham = r.MaSanPham
-        LEFT JOIN SanPham_BienThe AS bt ON s.MaSanPham = bt.MaSanPham
-        LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
-        WHERE s.MaSanPham != ?
-        GROUP BY s.MaSanPham
-        HAVING DiemTrungBinh BETWEEN ? AND ?
-        ORDER BY s.SoLuotXem DESC
+        FROM
+            SanPhams AS s
+        LEFT JOIN
+            Reviews AS r ON s.MaSanPham = r.MaSanPham
+        LEFT JOIN
+            SanPham_BienThe AS bt ON s.MaSanPham = bt.MaSanPham
+        LEFT JOIN
+            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
+        WHERE
+            -- Điều kiện: Khác sản phẩm hiện tại
+            s.MaSanPham != ?
+        GROUP BY
+            s.MaSanPham
+        HAVING
+            -- Điều kiện: Có điểm đánh giá tương tự
+            DiemTrungBinh BETWEEN ? AND ?
+        ORDER BY
+            s.SoLuotXem DESC
         LIMIT 5;
         SQL;
 
         $db = self::getDB();
-        
+
         $params = [$current_product_id, $current_rating - 0.5, $current_rating + 0.5];
         $result = $db->getList($select, $params);
         return $result->fetchAll(PDO::FETCH_ASSOC);
@@ -650,20 +695,41 @@ class MasterModel
     {
         $select = <<<SQL
         SELECT
-            s.MaSanPham, s.TenSanPham, s.AnhDaiDien, s.DacDiemNoiBat,
-            ncc.TenNhaCungCap, bt.MaBienThe, bt.DungLuong, bt.MauSac,
-            bt.GiaGoc, bt.GiaKhuyenMai,
+            s.MaSanPham,
+            s.TenSanPham,
+            s.AnhDaiDien,
+            s.NgayRaMat,
+            s.DacDiemNoiBat,
+            ncc.TenNhaCungCap,
+            bt.MaBienThe,
+            bt.DungLuong,
+            bt.MauSac,
+            bt.GiaGoc,
+            bt.GiaKhuyenMai,
+            bt.SoLuotBan,
+            tsk.ManHinhRong,
+            tsk.ChipXuLy,
+            tsk.RAM,
             (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
             (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
-        FROM SanPham_BienThe AS bt
-        INNER JOIN SanPhams AS s ON bt.MaSanPham = s.MaSanPham
-        LEFT JOIN NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
-        WHERE bt.GiaGoc BETWEEN ? AND ? AND s.MaSanPham != ?
-        GROUP BY s.MaSanPham
-        ORDER BY s.SoLuotXem DESC
+        FROM
+            SanPham_BienThe AS bt
+        INNER JOIN
+            SanPhams AS s ON bt.MaSanPham = s.MaSanPham
+        LEFT JOIN
+            NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN
+            ThongSoKyThuat AS tsk ON s.MaSanPham = tsk.MaSanPham
+        WHERE
+            -- Điều kiện vẫn được giữ nguyên: cùng phân khúc giá và khác sản phẩm hiện tại
+            bt.GiaGoc BETWEEN ? AND ? AND s.MaSanPham != ?
+        GROUP BY
+            s.MaSanPham -- Nhóm lại để mỗi sản phẩm chỉ xuất hiện 1 lần
+        ORDER BY
+            s.SoLuotXem DESC -- Sắp xếp theo lượt xem nhiều nhất
         LIMIT 5;
         SQL;
-        
+
         $db = self::getDB();
         // Dùng hàm getList an toàn với 3 tham số
         $params = [$current_price - 3000000, $current_price + 3000000, $current_product_id];

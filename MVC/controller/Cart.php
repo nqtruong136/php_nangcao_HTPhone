@@ -40,9 +40,9 @@ class Cart extends MasterController
                 'count' => $this->cartModel->getItemCount()
             ];
             // Gọi một file view partial để render (tái sử dụng code)
-            require 'view/Partials/cartmini.php';
+            require 'view/Partials/_cart_content.php';
             $miniCartHtml = ob_get_clean();
-
+            //var_dump($miniCartHtml);
 
             // Phản hồi lại cho AJAX (ví dụ) hoặc chuyển hướng
             $response = [

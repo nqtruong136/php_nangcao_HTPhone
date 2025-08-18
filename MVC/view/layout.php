@@ -629,15 +629,14 @@
               // **LOGIC SỬA LỖI TRÙNG LẶP:**
               // 1. Tìm component giỏ hàng mini hiện tại bằng class của nó.
               // QUAN TRỌNG: Đảm bảo chỉ có MỘT element với class này trên trang.
-              var $currentCart = $('.box-dropdown-cart');
+              //var $currentCart = $('.box-dropdown-cart');
 
               // 2. Kiểm tra xem nó có tồn tại không.
-              if ($currentCart.length > 0) {
-                // 3. Hàm .replaceWith() của jQuery sẽ XÓA component cũ
-                // và THAY THẾ nó bằng HTML mới từ server.
-                // Đây là mấu chốt để không bị nhân đôi giỏ hàng.
-                $currentCart.replaceWith(response.new_mini_cart_html);
-              }
+              $('#mini-cart-count').text(response.item_count);
+
+              // 2. Cập nhật lại toàn bộ nội dung của dropdown.
+              // Hàm .html() sẽ xóa nội dung cũ và thay bằng HTML mới.
+              $('#mini-cart-dropdown').html(response.mini_cart_html);
               // **CẬP NHẬT 1:** Cập nhật số lượng trên icon giỏ hàng mini
               /*$('#mini-cart-count').text(response.item_count);
 

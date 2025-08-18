@@ -171,7 +171,30 @@
                 </ul>
               </div>
             </div><a class="font-lg icon-list icon-wishlist" href="shop-wishlist.html"><span>Wishlist</span><span class="number-item font-xs">5</span></a>
-            <?php require 'view/Partials/cartmini.php'; ?>
+
+            <?php
+
+            $cart = [
+              'items' => [],
+              'total' => 0,
+              'count' => 0
+            ];
+
+            // Nếu session có dữ liệu giỏ hàng
+            if (!empty($_SESSION['cart'])) {
+              $total = 0;
+              $count = 0;
+
+              foreach ($_SESSION['cart'] as $item) {
+                $total += $item['price'] * $item['quantity']; // tính tổng tiền
+                $count += $item['quantity'];                  // tính tổng số lượng
+              }
+
+              $cart['items'] = $_SESSION['cart']; // gán danh sách sản phẩm
+              $cart['total'] = $total;            // gán tổng tiền
+              $cart['count'] = $count;            // gán số lượng
+            }
+            require 'view/Partials/cartmini.php'; ?>
             <a class="font-lg icon-list icon-compare" href="shop-compare.html"><span>Compare</span></a>
           </div>
         </div>

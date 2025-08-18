@@ -10,7 +10,7 @@ class MasterController
     {
         //Khởi tạo kết nối database
         $this->cartModel_c = new CartModel();
-        $this->prepareCartData(); // Chuẩn bị dữ liệu giỏ hàng
+        $temp=$this->prepareCartData(); // Chuẩn bị dữ liệu giỏ hàng
     }
 
     protected function prepareCartData()
@@ -42,6 +42,7 @@ class MasterController
 
         $viewData = array_merge($data, ['cart' => $this->cartData]);// Chuyển đổi mảng data thành các biến để sử dụng trong view
         extract($viewData);
+        
 
         // Đường dẫn đến file view
         $viewPath = "view/" . $view . "/index.php";

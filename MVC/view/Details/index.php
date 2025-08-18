@@ -84,7 +84,7 @@ function render_product_card($product)
                 {$priceLine}
             </div>
             <div class="mt-20 box-btn-cart">
-                <a class="btn btn-cart add-to-cart-btn" href="#"
+                <a class="btn btn-cart add-to-cart-btn" href="?controller=Cart&action=add"
                   data-product-id="{$product['MaSanPham']}"
                   data-variant-id="{$product['MaBienThe']}"
                   data-product-name="{$product['TenSanPham']} {$product['DungLuong']} {$product['RAM']} {$product['MauSac']}"

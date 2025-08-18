@@ -15,11 +15,11 @@ $detail_of_product_name = $product['TenSanPham'] . ' ' .  $product['RAM'] . ' ' 
 $detail_of_product_price = !empty($defaultVariant['GiaKhuyenMai']) ? $defaultVariant['GiaKhuyenMai'] : $defaultVariant['GiaGoc'];
 $detail_of_product_image = $product['AnhDaiDien'];
 $detail_of_product_variant_id = $defaultVariant['MaBienThe'];
-var_dump($detail_of_product_variant_id);
-var_dump($detail_of_product_id);
-var_dump($detail_of_product_name);
-var_dump($detail_of_product_price);
-var_dump($detail_of_product_image);
+// var_dump($detail_of_product_variant_id);
+// var_dump($detail_of_product_id);
+// var_dump($detail_of_product_name);
+// var_dump($detail_of_product_price);
+// var_dump($detail_of_product_image);
 
 function render_product_card($product)
 {
@@ -84,7 +84,7 @@ function render_product_card($product)
                 {$priceLine}
             </div>
             <div class="mt-20 box-btn-cart">
-                <a class="btn btn-cart add-to-cart-btn" href="?controller=Cart&action=add"
+                <a class="btn btn-cart add-to-cart-btn" href=""
                   data-product-id="{$product['MaSanPham']}"
                   data-variant-id="{$product['MaBienThe']}"
                   data-product-name="{$product['TenSanPham']} {$product['DungLuong']} {$product['RAM']} {$product['MauSac']}"
@@ -280,12 +280,12 @@ HTML;
                   </div>
                 </div>
                 <div class="button-buy mt-15"><a
-                    class="btn btn-cart mb-15"
+                    class="btn btn-cart mb-15 add-to-cart-btn "
                     data-product-id="<?php echo $detail_of_product_id; ?>"
                     data-variant-id="<?php echo $detail_of_product_variant_id; ?>"
                     data-product-name="<?php echo htmlspecialchars($detail_of_product_name); ?>"
                     data-price="<?php echo $detail_of_product_price; ?>"
-                    data-image="<?php echo htmlspecialchars($detail_of_product_image); ?>" href="#">
+                    data-image="<?php echo htmlspecialchars($detail_of_product_image); ?>" href="">
                     Add To Cart
                   </a><a class="btn btn-buy" href="shop-checkout.html">Buy now</a></div>
               </div>
@@ -304,7 +304,7 @@ HTML;
         </div>
         <div class="price-bought">
           <h3 class="color-brand-3 mr-10">$2856.3</h3><span class="font-lg color-gray-900">(3 items)</span>
-          <div class="box-btn-add-cart"><a class="btn btn-cart" href="shop-cart.html">Add To Cart</a></div>
+          <div class="box-btn-add-cart"><a class="btn btn-cart" href="?controller=Cart&action=add">Add To Cart</a></div>
         </div>
       </div>
       <label class="cb-container-2">

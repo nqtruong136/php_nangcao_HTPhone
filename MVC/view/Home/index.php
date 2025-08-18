@@ -16,43 +16,44 @@ function formatPriceToK($price)
  * @param array $products - Mảng sản phẩm lấy từ CSDL.
  * @param int $itemsPerSlide - Số lượng sản phẩm trên mỗi slide. Mặc định là 6.
  */
-function render_top_selling_slider($products, $itemsPerSlide = 6) {
-    $totalProducts = count($products);
-    if ($totalProducts === 0) {
-        echo "<p>Không có sản phẩm nào để hiển thị.</p>";
-        return;
+function render_top_selling_slider($products, $itemsPerSlide = 6)
+{
+  $totalProducts = count($products);
+  if ($totalProducts === 0) {
+    echo "<p>Không có sản phẩm nào để hiển thị.</p>";
+    return;
+  }
+
+  $counter = 0;
+  foreach ($products as $product) {
+    // **LOGIC CỐT LÕI BẮT ĐẦU**
+
+    // Kiểm tra xem có phải là lúc bắt đầu một slide mới không
+    // Điều này xảy ra khi biến đếm chia hết cho số sản phẩm trên mỗi slide
+    if ($counter % $itemsPerSlide === 0) {
+      // Nếu đây không phải là slide đầu tiên, hãy đóng thẻ của slide trước đó
+      if ($counter > 0) {
+        echo '</div></div>'; // Đóng thẻ .row và .swiper-slide
+      }
+      // Mở thẻ cho slide mới
+      echo '<div class="swiper-slide"><div class="row">';
     }
 
-    $counter = 0;
-    foreach ($products as $product) {
-        // **LOGIC CỐT LÕI BẮT ĐẦU**
+    // **LOGIC CỐT LÕI KẾT THÚC**
 
-        // Kiểm tra xem có phải là lúc bắt đầu một slide mới không
-        // Điều này xảy ra khi biến đếm chia hết cho số sản phẩm trên mỗi slide
-        if ($counter % $itemsPerSlide === 0) {
-            // Nếu đây không phải là slide đầu tiên, hãy đóng thẻ của slide trước đó
-            if ($counter > 0) {
-                echo '</div></div>'; // Đóng thẻ .row và .swiper-slide
-            }
-            // Mở thẻ cho slide mới
-            echo '<div class="swiper-slide"><div class="row">';
-        }
+    // --- Phần render HTML cho một thẻ sản phẩm (card-grid-style-2) ---
+    $giaHienThi = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
+    $formattedPrice = number_format($giaHienThi, 0, ',', '.') . 'đ';
+    $rating = round($product['DiemTrungBinh']);
+    $stars = str_repeat('<img src="assets/imgs/template/icons/star.svg" alt="Ecom">', $rating);
+    $priceLine = '';
+    if (!empty($product['GiaKhuyenMai'])) {
+      $formattedGiaGoc = number_format($product['GiaGoc'], 0, ',', '.') . 'đ';
+      $priceLine = "<span class=\"color-gray-500 price-line\">{$formattedGiaGoc}</span>";
+    }
+    $tenDayDu = $product['TenSanPham'] . ' ' . $product['DungLuong'];
 
-        // **LOGIC CỐT LÕI KẾT THÚC**
-
-        // --- Phần render HTML cho một thẻ sản phẩm (card-grid-style-2) ---
-        $giaHienThi = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
-        $formattedPrice = number_format($giaHienThi, 0, ',', '.') . 'đ';
-        $rating = round($product['DiemTrungBinh']);
-        $stars = str_repeat('<img src="assets/imgs/template/icons/star.svg" alt="Ecom">', $rating);
-        $priceLine = '';
-        if (!empty($product['GiaKhuyenMai'])) {
-            $formattedGiaGoc = number_format($product['GiaGoc'], 0, ',', '.') . 'đ';
-            $priceLine = "<span class=\"color-gray-500 price-line\">{$formattedGiaGoc}</span>";
-        }
-        $tenDayDu = $product['TenSanPham'] . ' ' . $product['DungLuong'];
-
-        echo <<<HTML
+    echo <<<HTML
         <div class="col-lg-6 col-md-6 col-sm-12">
             <div class="card-grid-style-2">
                 <div class="image-box">
@@ -75,23 +76,24 @@ function render_top_selling_slider($products, $itemsPerSlide = 6) {
             </div>
         </div>
 HTML;
-        // Tăng biến đếm sau mỗi lần lặp
-        $counter++;
-    }
+    // Tăng biến đếm sau mỗi lần lặp
+    $counter++;
+  }
 
-    // **QUAN TRỌNG:** Sau khi vòng lặp kết thúc, phải đóng thẻ của slide cuối cùng
-    if ($totalProducts > 0) {
-        echo '</div></div>'; // Đóng thẻ .row và .swiper-slide cuối cùng
-    }
+  // **QUAN TRỌNG:** Sau khi vòng lặp kết thúc, phải đóng thẻ của slide cuối cùng
+  if ($totalProducts > 0) {
+    echo '</div></div>'; // Đóng thẻ .row và .swiper-slide cuối cùng
+  }
 }
 
-function render_blog_card($blog) {
-    // Định dạng lại ngày tháng cho đẹp hơn (ví dụ: September 02, 2022)
-    $date = new DateTime($blog['NgayDang']);
-    $formattedDate = $date->format('F d, Y');
+function render_blog_card($blog)
+{
+  // Định dạng lại ngày tháng cho đẹp hơn (ví dụ: September 02, 2022)
+  $date = new DateTime($blog['NgayDang']);
+  $formattedDate = $date->format('F d, Y');
 
-    // Xuất HTML
-    echo <<<HTML
+  // Xuất HTML
+  echo <<<HTML
     <div class="swiper-slide">
         <div class="card-grid-style-1">
             <div class="image-box">
@@ -133,7 +135,7 @@ function render_product_card_best_seller($product)
   }
 
   // Tạo tên sản phẩm đầy đủ
-  $tenDayDu = strtotime($product['TenSanPham']). ' '. $product['TenSanPham'] . ' ' . $product['RAM'] . ' ' . $product['DungLuong'] . ' ' . $product['MauSac'];
+  $tenDayDu = strtotime($product['TenSanPham']) . ' ' . $product['TenSanPham'] . ' ' . $product['RAM'] . ' ' . $product['DungLuong'] . ' ' . $product['MauSac'];
 
   // Tạo danh sách thông số kỹ thuật
   $features = '';
@@ -146,7 +148,7 @@ function render_product_card_best_seller($product)
   if (!empty($product['RAM'])) {
     $features .= "<li>RAM: {$product['RAM']}</li>";
   }
-
+ $price = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
   // Xuất HTML
   echo <<<HTML
     <div class="card-grid-style-3">
@@ -175,7 +177,15 @@ function render_product_card_best_seller($product)
                 {$priceLine}
             </div>
             <div class="mt-20 box-btn-cart">
-                <a class="btn btn-cart" href="#">Add To Cart</a>
+                <a class="btn btn-cart add-to-cart-btn" href="#"
+                  data-product-id="{$product['MaSanPham']}"
+                  data-variant-id="{$product['MaBienThe']}"
+                  data-product-name="{$product['TenSanPham']} {$product['DungLuong']} {$product['RAM']} {$product['MauSac']}"
+                  data-price="{$price}"
+                  data-image="{$product['AnhDaiDien']}"
+                >
+                Add To Cart
+                </a>
             </div>
             <ul class="list-features">
                 {$features}
@@ -186,36 +196,37 @@ function render_product_card_best_seller($product)
 HTML;
 }
 
-function render_product_card_last_deals($product) {
-    // Xác định giá hiển thị cuối cùng (ưu tiên giá khuyến mãi)
-    $giaHienThi = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
-    $formattedPrice = number_format($giaHienThi, 0, ',', '.') . 'đ';
-    
-    // Tạo chuỗi HTML cho các ngôi sao đánh giá
-    $rating = round($product['DiemTrungBinh']);
-    $stars = str_repeat('<img src="assets/imgs/template/icons/star.svg" alt="Ecom">', $rating) . str_repeat('<img src="assets/imgs/template/icons/star-gray.svg" alt="Ecom">', 5 - $rating);
+function render_product_card_last_deals($product)
+{
+  // Xác định giá hiển thị cuối cùng (ưu tiên giá khuyến mãi)
+  $giaHienThi = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
+  $formattedPrice = number_format($giaHienThi, 0, ',', '.') . 'đ';
 
-    // Tạo nhãn giảm giá (nếu có)
-    $discountLabel = '';
-    $priceLine = '';
-    if (!empty($product['GiaKhuyenMai']) && $product['GiaGoc'] > $product['GiaKhuyenMai']) {
-        $percentage = round((($product['GiaGoc'] - $product['GiaKhuyenMai']) / $product['GiaGoc']) * 100);
-        $discountLabel = "<span class=\"label bg-brand-2\">-{$percentage}%</span>";
-        $formattedGiaGoc = number_format($product['GiaGoc'], 0, ',', '.') . 'đ';
-        $priceLine = "<span class=\"color-gray-500 price-line\">{$formattedGiaGoc}</span>";
-    }
+  // Tạo chuỗi HTML cho các ngôi sao đánh giá
+  $rating = round($product['DiemTrungBinh']);
+  $stars = str_repeat('<img src="assets/imgs/template/icons/star.svg" alt="Ecom">', $rating) . str_repeat('<img src="assets/imgs/template/icons/star-gray.svg" alt="Ecom">', 5 - $rating);
 
-    // Tạo tên sản phẩm đầy đủ
-    $tenDayDu = $product['TenSanPham'] . ' ' . $product['DungLuong'] . ' ' . $product['MauSac'];
+  // Tạo nhãn giảm giá (nếu có)
+  $discountLabel = '';
+  $priceLine = '';
+  if (!empty($product['GiaKhuyenMai']) && $product['GiaGoc'] > $product['GiaKhuyenMai']) {
+    $percentage = round((($product['GiaGoc'] - $product['GiaKhuyenMai']) / $product['GiaGoc']) * 100);
+    $discountLabel = "<span class=\"label bg-brand-2\">-{$percentage}%</span>";
+    $formattedGiaGoc = number_format($product['GiaGoc'], 0, ',', '.') . 'đ';
+    $priceLine = "<span class=\"color-gray-500 price-line\">{$formattedGiaGoc}</span>";
+  }
 
-    // Tạo danh sách thông số kỹ thuật
-    $features = '';
-    if (!empty($product['DacDiemNoiBat'])) {
+  // Tạo tên sản phẩm đầy đủ
+  $tenDayDu = $product['TenSanPham'] . ' ' . $product['DungLuong'] . ' ' . $product['MauSac'];
+
+  // Tạo danh sách thông số kỹ thuật
+  $features = '';
+  if (!empty($product['DacDiemNoiBat'])) {
     $features = "<li>{$product['DacDiemNoiBat']}</li>";
-    }
-
-    // Xuất HTML
-    echo <<<HTML
+  }
+ $price = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
+  // Xuất HTML
+  echo <<<HTML
     <div class="card-grid-style-3">
       <div class="card-grid-inner">
         <div class="tools">
@@ -242,7 +253,15 @@ function render_product_card_last_deals($product) {
                 {$priceLine}
             </div>
             <div class="mt-20 box-btn-cart">
-                <a class="btn btn-cart" href="#">Add To Cart</a>
+                <a class="btn btn-cart add-to-cart-btn" href="#"
+                  data-product-id="{$product['MaSanPham']}"
+                  data-variant-id="{$product['MaBienThe']}"
+                  data-product-name="{$product['TenSanPham']} {$product['DungLuong']} {$product['RAM']} {$product['MauSac']}"
+                  data-price="{$price}"
+                  data-image="{$product['AnhDaiDien']}"
+                >
+                Add To Cart
+                </a>
             </div>
             <ul class="list-features">
                 {$features}
@@ -269,7 +288,7 @@ function render_product_card($product)
     $percentage = round((($product['GiaGoc'] - $product['GiaKhuyenMai']) / $product['GiaGoc']) * 100);
     $discountLabel = "<span class=\"label bg-brand-2\">-{$percentage}%</span>";
   }
-
+  $price = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
   echo <<<HTML
         <div class="card-grid-style-3">
           <div class="card-grid-inner">
@@ -297,7 +316,15 @@ function render_product_card($product)
                     <strong class="font-lg-bold color-brand-3 price-main">{$formattedPrice}</strong>
                 </div>
                 <div class="mt-20 box-btn-cart">
-                    <a class="btn btn-cart" href="shop-cart.html">Add To Cart</a>
+                    <a class="btn btn-cart add-to-cart-btn" href="#"
+                  data-product-id="{$product['MaSanPham']}"
+                  data-variant-id="{$product['MaBienThe']}"
+                  data-product-name="{$product['TenSanPham']} {$product['DungLuong']} {$product['RAM']} {$product['MauSac']}"
+                  data-price="{$price}"
+                  data-image="{$product['AnhDaiDien']}"
+                >
+                Add To Cart
+                </a>
                 </div>
             </div>
           </div>
@@ -582,23 +609,23 @@ HTML;
               render_product_card_best_seller($item);
             }
             ?>
-              <div class="card-grid-style-3">
-                <div class="card-grid-inner">
-                  <div class="tools"><a class="btn btn-trend btn-tooltip mb-10" href="#" aria-label="Trend" data-bs-placement="left"></a><a class="btn btn-wishlist btn-tooltip mb-10" href="shop-wishlist.html" aria-label="Add To Wishlist"></a><a class="btn btn-compare btn-tooltip mb-10" href="shop-compare.html" aria-label="Compare"></a><a class="btn btn-quickview btn-tooltip" aria-label="Quick view" href="#ModalQuickview" data-bs-toggle="modal"></a></div>
-                  <div class="image-box"><span class="label bg-brand-2">-17%</span><a href="shop-single-product.html"><img src="assets/imgs/page/homepage1/imgsp3.png" alt="Ecom"></a></div>
-                  <div class="info-right"><a class="font-xs color-gray-500" href="shop-vendor-single.html">Apple</a><br><a class="color-brand-3 font-sm-bold" href="shop-single-product.html">2022 Apple iMac with Retina 5K Display 8GB RAM, 256GB</a>
-                    <div class="rating"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><span class="font-xs color-gray-500">(65)</span></div>
-                    <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">$2856.3</strong><span class="color-gray-500 price-line">$3225.6</span></div>
-                    <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="shop-cart.html">Add To Cart</a></div>
-                    <ul class="list-features">
-                      <li>27-inch (diagonal) Retina 5K display</li>
-                      <li>3.1GHz 6-core 10th-generation Intel Core i5</li>
-                      <li>AMD Radeon Pro 5300 graphics</li>
-                    </ul>
-                  </div>
+            <div class="card-grid-style-3">
+              <div class="card-grid-inner">
+                <div class="tools"><a class="btn btn-trend btn-tooltip mb-10" href="#" aria-label="Trend" data-bs-placement="left"></a><a class="btn btn-wishlist btn-tooltip mb-10" href="shop-wishlist.html" aria-label="Add To Wishlist"></a><a class="btn btn-compare btn-tooltip mb-10" href="shop-compare.html" aria-label="Compare"></a><a class="btn btn-quickview btn-tooltip" aria-label="Quick view" href="#ModalQuickview" data-bs-toggle="modal"></a></div>
+                <div class="image-box"><span class="label bg-brand-2">-17%</span><a href="shop-single-product.html"><img src="assets/imgs/page/homepage1/imgsp3.png" alt="Ecom"></a></div>
+                <div class="info-right"><a class="font-xs color-gray-500" href="shop-vendor-single.html">Apple</a><br><a class="color-brand-3 font-sm-bold" href="shop-single-product.html">2022 Apple iMac with Retina 5K Display 8GB RAM, 256GB</a>
+                  <div class="rating"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><img src="assets/imgs/template/icons/star.svg" alt="Ecom"><span class="font-xs color-gray-500">(65)</span></div>
+                  <div class="price-info"><strong class="font-lg-bold color-brand-3 price-main">$2856.3</strong><span class="color-gray-500 price-line">$3225.6</span></div>
+                  <div class="mt-20 box-btn-cart"><a class="btn btn-cart" href="shop-cart.html">Add To Cart</a></div>
+                  <ul class="list-features">
+                    <li>27-inch (diagonal) Retina 5K display</li>
+                    <li>3.1GHz 6-core 10th-generation Intel Core i5</li>
+                    <li>AMD Radeon Pro 5300 graphics</li>
+                  </ul>
                 </div>
               </div>
-            
+            </div>
+
             <div class="card-grid-style-3">
               <div class="card-grid-inner">
                 <div class="tools"><a class="btn btn-trend btn-tooltip mb-10" href="#" aria-label="Trend" data-bs-placement="left"></a><a class="btn btn-wishlist btn-tooltip mb-10" href="shop-wishlist.html" aria-label="Add To Wishlist"></a><a class="btn btn-compare btn-tooltip mb-10" href="shop-compare.html" aria-label="Compare"></a><a class="btn btn-quickview btn-tooltip" aria-label="Quick view" href="#ModalQuickview" data-bs-toggle="modal"></a></div>
@@ -992,23 +1019,23 @@ HTML;
         </div>
         <div class="col-lg-8">
           <div class="row">
-            
+
             <?php
-            foreach($data['data_last_deals'] as $product) {
+            foreach ($data['data_last_deals'] as $product) {
             ?>
-            <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-            <?php 
-            render_product_card_last_deals($product);
-            ?>
-            </div>
+              <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                <?php
+                render_product_card_last_deals($product);
+                ?>
+              </div>
             <?php } ?>
-            
-            
+
+
           </div>
         </div>
       </div>
       <div class="list-products-5">
-        
+
         <?php
         foreach ($data['data_last_deals'] as $product) {
           render_product_card_last_deals($product);
@@ -1643,7 +1670,7 @@ HTML;
             foreach ($data['data_last_newBlog'] as $blog) {
               render_blog_card($blog);
             }
-            
+
             ?>
             <div class="swiper-slide">
               <div class="card-grid-style-1">

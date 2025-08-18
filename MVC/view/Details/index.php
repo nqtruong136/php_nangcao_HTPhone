@@ -10,6 +10,16 @@ $uniqueStyles = array_filter(array_unique(array_column($variants, 'Style')));
 
 $defaultVariant = $variants[0];
 
+$detail_of_product_id = $product['MaSanPham'];
+$detail_of_product_name = $product['TenSanPham'] . ' ' .  $product['RAM'] . ' ' . $defaultVariant['DungLuong'] . ' ' . $defaultVariant['MauSac'];
+$detail_of_product_price = !empty($defaultVariant['GiaKhuyenMai']) ? $defaultVariant['GiaKhuyenMai'] : $defaultVariant['GiaGoc'];
+$detail_of_product_image = $product['AnhDaiDien'];
+$detail_of_product_variant_id = $defaultVariant['MaBienThe'];
+var_dump($detail_of_product_variant_id);
+var_dump($detail_of_product_id);
+var_dump($detail_of_product_name);
+var_dump($detail_of_product_price);
+var_dump($detail_of_product_image);
 
 function render_product_card($product)
 {
@@ -45,7 +55,7 @@ function render_product_card($product)
   if (!empty($product['RAM'])) {
     $features .= "<li>RAM: {$product['RAM']}</li>";
   }
-
+  $price = !empty($product['GiaKhuyenMai']) ? $product['GiaKhuyenMai'] : $product['GiaGoc'];
   // Xuất HTML
   echo <<<HTML
     <div class="card-grid-style-3">
@@ -58,7 +68,7 @@ function render_product_card($product)
         </div>
         <div class="image-box">
           {$discountLabel}
-          <a href="?url=Details/index/{$product['MaSanPham']}">
+          <a href="?controller=Details&action=index&id={$product['MaSanPham']}">
               <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
           </a>
         </div>
@@ -74,7 +84,15 @@ function render_product_card($product)
                 {$priceLine}
             </div>
             <div class="mt-20 box-btn-cart">
-                <a class="btn btn-cart" href="#">Add To Cart</a>
+                <a class="btn btn-cart add-to-cart-btn" href="#"
+                  data-product-id="{$product['MaSanPham']}"
+                  data-variant-id="{$product['MaBienThe']}"
+                  data-product-name="{$product['TenSanPham']} {$product['DungLuong']} {$product['RAM']} {$product['MauSac']}"
+                  data-price="{$price}"
+                  data-image="{$product['AnhDaiDien']}"
+                >
+                Add To Cart
+                </a>
             </div>
             <ul class="list-features">
                 {$features}
@@ -261,7 +279,15 @@ HTML;
                     </div>
                   </div>
                 </div>
-                <div class="button-buy mt-15"><a class="btn btn-cart mb-15" href="shop-cart.html">Add to cart</a><a class="btn btn-buy" href="shop-checkout.html">Buy now</a></div>
+                <div class="button-buy mt-15"><a
+                    class="btn btn-cart mb-15"
+                    data-product-id="<?php echo $detail_of_product_id; ?>"
+                    data-variant-id="<?php echo $detail_of_product_variant_id; ?>"
+                    data-product-name="<?php echo htmlspecialchars($detail_of_product_name); ?>"
+                    data-price="<?php echo $detail_of_product_price; ?>"
+                    data-image="<?php echo htmlspecialchars($detail_of_product_image); ?>" href="#">
+                    Add To Cart
+                  </a><a class="btn btn-buy" href="shop-checkout.html">Buy now</a></div>
               </div>
             </div>
           </div>

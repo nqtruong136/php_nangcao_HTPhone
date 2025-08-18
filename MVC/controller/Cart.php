@@ -1,95 +1,93 @@
 <?php
 require_once 'model/CartModel.php';
+session_start();
 class Cart extends MasterController
 {
+    private $cartModel;
+
+    public function __construct()
+    {
+        $this->cartModel = new CartModel();
+    }
     public function index()
     {
-        $this->render('Cart');
-    }
+        $cartItems = $this->cartModel->getContents();
+        $cartTotal = $this->cartModel->getTotal();
 
-    public function addCart()
-    {
-        // $id = $_POST["id"];
-        // $name = $_POST["name"];
-        // $price = $_POST["price"];
-        // $img = $_POST["img"];
-        // $quantity = (isset($_POST["quantity"]) && $_POST["quantity"] > 0) ? $_POST["quantity"] : 1;
-
-        // if (isset($_SESSION["cart"][$id])) {
-        //     $_SESSION["cart"][$id]["quantity"] += $quantity;
-        // } else {
-        //     $_SESSION["cart"][$id] = array(
-        //         "id" => $id,
-        //         "name" => $name,
-        //         "price" => $price,
-        //         "img" => $img,
-        //         "quantity" => $quantity
-        //     );
-        // }
-        // echo "<script>window.location.href = '?controller=Details&action=index&id=$id';</script>";
-        // exit();
+        // Truyền dữ liệu giỏ hàng ra view
+        $this->render('Cart', [
+            'cartItems' => $cartItems,
+            'cartTotal' => $cartTotal
+        ]);
     }
-    
-    public function clearCart()
+    public function add()
     {
-        unset($_SESSION["cart"]);
-        echo "<script>window.location.href = '?controller=Cart&action=index';</script>";
-        exit();
-    }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $product_id = $_POST['product_id'];
+            $variant_id = $_POST['variant_id'];
+            $product_name = $_POST['product_name'];
+            $price = $_POST['price'];
+            $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+            $image = $_POST['image'];
 
-    public function removeItem()
-    {
-        $id = $_GET['id'];
-        if (isset($_SESSION['cart'][$id])) {
-            unset($_SESSION['cart'][$id]);
+            // Gọi Model để xử lý logic
+            $this->cartModel->add($variant_id, $product_id, $product_name, $price, $quantity, $image);
+            ob_start();
+            // Lấy dữ liệu mới nhất
+            $cart = [
+                'items' => $this->cartModel->getContents(),
+                'total' => $this->cartModel->getTotal(),
+                'count' => $this->cartModel->getItemCount()
+            ];
+            // Gọi một file view partial để render (tái sử dụng code)
+            require 'view/Partials/cartmini.php';
+            $miniCartHtml = ob_get_clean();
+
+
+            // Phản hồi lại cho AJAX (ví dụ) hoặc chuyển hướng
+            $response = [
+                'success' => true,
+                'message' => 'Đã thêm sản phẩm vào giỏ hàng!',
+                'item_count' => $cart['count'],
+                'mini_cart_html' => $miniCartHtml // Gửi cả HTML đi
+            ];
+
+            header('Content-Type: application/json');
+            echo json_encode($response);
+            //header('Location: ' . $_SERVER['HTTP_REFERER']); // Quay lại trang trước đó
+            exit();
         }
-        header('Content-Type: application/json');
-        echo json_encode(['cart_count' => isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0]);
-        exit();
     }
 
-    public function updateCart()
+    // Xử lý yêu cầu cập nhật giỏ hàng
+    public function update()
     {
-        if (isset($_POST['quantity'])) {
-            foreach ($_POST['quantity'] as $id => $quantity) {
-                if ($quantity > 0 && isset($_SESSION['cart'][$id])) {
-                    $_SESSION['cart'][$id]['quantity'] = $quantity;
-                } else {
-                    unset($_SESSION['cart'][$id]);
-                }
-            }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $variant_id = $_POST['variant_id'];
+            $quantity = (int)$_POST['quantity'];
+
+            $this->cartModel->update($variant_id, $quantity);
+
+            header('Location: ?url=Cart/index'); // Tải lại trang giỏ hàng
+            exit();
         }
-        header('Content-Type: application/json');
-        echo json_encode(['cart_count' => isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0]);
-        exit();
     }
 
-    public function addCartAjax()
+    // Xử lý yêu cầu xóa sản phẩm
+    public function remove()
     {
-        $id = $_POST["id"];
-        $name = $_POST["name"];
-        $price = $_POST["price"];
-        $img = $_POST["img"];
-        $quantity = (isset($_POST["quantity"]) && $_POST["quantity"] > 0) ? $_POST["quantity"] : 1;
+        if (isset($_GET['variant_id'])) {
+            $variant_id = $_GET['variant_id'];
+            $this->cartModel->remove($variant_id);
 
-        if (isset($_SESSION["cart"][$id])) {
-            $_SESSION["cart"][$id]["quantity"] += $quantity;
-        } else {
-            $_SESSION["cart"][$id] = array(
-                "id" => $id,
-                "name" => $name,
-                "price" => $price,
-                "img" => $img,
-                "quantity" => $quantity
-            );
+            header('Location: ?url=Cart/index'); // Tải lại trang giỏ hàng
+            exit();
         }
-        header('Content-Type: application/json');
-        echo json_encode(['cart_count' => count($_SESSION['cart'])]);
-        exit();
     }
-
-    public function addItem($itemId, $quantity)
+    public function clear()
     {
+        $this->cartModel->clear();
+         // Tải lại trang giỏ hàng
+        exit();
     }
 }
-?>

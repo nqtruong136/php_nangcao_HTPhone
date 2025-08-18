@@ -16,7 +16,8 @@ require_once 'model/MasterModel.php';
 
 require_once 'controller/MasterController.php';
 
-
+require_once 'controller/Details.php';
+require_once 'controller/Cart.php';
 require_once 'model/UsersModel.php';
 //require_once 'model/Home.php';
 //Gọi URL dưới tên demo.com/?controller=yourController&action=yourAction
@@ -30,6 +31,24 @@ if (
     $controller = new Details();
     $controller->getRecentlyViewed(); // Gọi hàm trả về HTML/data
     exit; // Dừng lại, không include layout nữa
+}
+
+if (
+    isset($_GET['controller'], $_GET['action']) &&
+    $_GET['controller'] === 'Cart' &&
+    $_GET['action'] === 'add'
+) {
+    // 1. Nạp controller cần thiết
+    require_once 'controller/Cart.php';
+    
+    // 2. Tạo đối tượng controller
+    $controller = new Cart();
+    
+    // 3. Gọi action tương ứng
+    $controller->add();
+    
+    // 4. QUAN TRỌNG: Dừng script để không in ra HTML thừa
+    exit; 
 }
 
 if(isset($_GET['controller'], $_GET['action'])){

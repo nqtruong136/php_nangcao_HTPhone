@@ -319,7 +319,8 @@ class MasterModel
             SUM(ctdh.SoLuong) AS SoLuongBanTrongThang,
             -- Dùng subquery để lấy điểm đánh giá chung cho dòng sản phẩm
             (SELECT COALESCE(AVG(r.SoSao), 0) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS DiemTrungBinh,
-            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia
+            (SELECT COUNT(r.MaReview) FROM Reviews r WHERE r.MaSanPham = s.MaSanPham) AS TongLuotDanhGia,
+            tsk.RAM
         FROM
             ChiTietDonHangs AS ctdh
         INNER JOIN
@@ -330,13 +331,15 @@ class MasterModel
             SanPhams AS s ON bt.MaSanPham = s.MaSanPham
         LEFT JOIN
             NhaCungCaps AS ncc ON s.MaNhaCungCap = ncc.MaNhaCungCap
+        LEFT JOIN 
+            thongsokythuat AS tsk ON bt.MaBienThe = tsk.MaSanPham
         WHERE
             -- Chỉ lấy các đơn hàng được đặt trong tháng và năm hiện tại
             MONTH(dh.NgayDat) = MONTH(CURDATE())
             AND YEAR(dh.NgayDat) = YEAR(CURDATE())
         GROUP BY
             -- Nhóm theo từng biến thể cụ thể
-            bt.MaBienThe, s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap, bt.DungLuong, bt.MauSac, bt.GiaGoc, bt.GiaKhuyenMai, s.DacDiemNoiBat
+            bt.MaBienThe, s.MaSanPham, s.TenSanPham, s.AnhDaiDien, ncc.TenNhaCungCap, bt.DungLuong, bt.MauSac, bt.GiaGoc, bt.GiaKhuyenMai, s.DacDiemNoiBat, tsk.RAM
         ORDER BY
             -- Sắp xếp theo tổng số lượng bán trong tháng giảm dần
             SoLuongBanTrongThang DESC
@@ -344,6 +347,7 @@ class MasterModel
         SQL;
         $db = self::getDB();
         $result = $db->getlist($select);
+        
         return $result->fetchAll(PDO::FETCH_ASSOC);
     }
     public function get_phone_topselling()

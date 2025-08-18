@@ -171,33 +171,8 @@
                 </ul>
               </div>
             </div><a class="font-lg icon-list icon-wishlist" href="shop-wishlist.html"><span>Wishlist</span><span class="number-item font-xs">5</span></a>
-            <div class="d-inline-block box-dropdown-cart"><span class="font-lg icon-list icon-cart"><span>Cart</span><span class="number-item font-xs">2</span></span>
-              <div class="dropdown-cart">
-                <div class="item-cart mb-20">
-                  <div class="cart-image"><img src="assets/imgs/page/homepage1/imgsp5.png" alt="Ecom"></div>
-                  <div class="cart-info"><a class="font-sm-bold color-brand-3" href="shop-single-product.html">2022 Apple iMac with Retina 5K Display 8GB RAM, 256GB SSD</a>
-                    <p><span class="color-brand-2 font-sm-bold">1 x $2856.4</span></p>
-                  </div>
-                </div>
-                <div class="item-cart mb-20">
-                  <div class="cart-image"><img src="assets/imgs/page/homepage1/imgsp4.png" alt="Ecom"></div>
-                  <div class="cart-info"><a class="font-sm-bold color-brand-3" href="shop-single-product-2.html">2022 Apple iMac with Retina 5K Display 8GB RAM, 256GB SSD</a>
-                    <p><span class="color-brand-2 font-sm-bold">1 x $2856.4</span></p>
-                  </div>
-                </div>
-                <div class="border-bottom pt-0 mb-15"></div>
-                <div class="cart-total">
-                  <div class="row">
-                    <div class="col-6 text-start"><span class="font-md-bold color-brand-3">Total</span></div>
-                    <div class="col-6"><span class="font-md-bold color-brand-1">$2586.3</span></div>
-                  </div>
-                  <div class="row mt-15">
-                    <div class="col-6 text-start"><a class="btn btn-cart w-auto" href="shop-cart.html">View cart</a></div>
-                    <div class="col-6"><a class="btn btn-buy w-auto" href="shop-checkout.html">Checkout</a></div>
-                  </div>
-                </div>
-              </div>
-            </div><a class="font-lg icon-list icon-compare" href="shop-compare.html"><span>Compare</span></a>
+            <?php require 'view/Partials/cartmini.php'; ?>
+            <a class="font-lg icon-list icon-compare" href="shop-compare.html"><span>Compare</span></a>
           </div>
         </div>
       </div>
@@ -586,7 +561,7 @@
   <script src="assets/js/vendors/slick.js"></script>
   <script src="assets/js/main2513.js?v=3.0.0"></script>
   <script src="assets/js/shop23cd.js?v=1.2.1"></script>
-  
+
   <script>
     // Nên đặt sau khi đã load jQuery và jquery.countdown.min.js
     $(document).ready(function() {
@@ -599,6 +574,93 @@
       });
     });
   </script>
+
+
+
+  <script>
+    function showSuccessToast(message) {
+      var toast = $('#cart-toast');
+      toast.text(message); // Cập nhật nội dung thông báo
+      toast.addClass('show'); // Hiển thị toast
+
+      // Tự động ẩn toast sau 3 giây
+      setTimeout(function() {
+        toast.removeClass('show');
+      }, 3000);
+    }
+
+
+    $(document).ready(function() {
+      // Lắng nghe sự kiện click trên TẤT CẢ các nút có class 'add-to-cart-btn'
+      $(document).on('click', '.add-to-cart-btn', function(e) {
+        // Ngăn chặn hành vi mặc định của thẻ <a> (tải lại trang)
+        e.preventDefault();
+
+        // Lấy đối tượng nút đã được click
+        var $button = $(this);
+
+        // Lấy toàn bộ dữ liệu từ các thuộc tính data-* của nút
+        var productId = $button.data('product-id');
+        var variantId = $button.data('variant-id');
+        var productName = $button.data('product-name');
+        var price = $button.data('price');
+        var image = $button.data('image');
+
+        // Lấy số lượng. Nếu có ô input#quantity-input thì lấy giá trị, nếu không thì mặc định là 1.
+        var quantity = $('#quantity-input').length ? $('#quantity-input').val() : 1;
+
+        // Gửi AJAX lên server
+        $.ajax({
+          url: '?controller=Cart&action=add', // URL tới action 'add' trong 'CartController'
+          method: 'POST',
+          data: {
+            product_id: productId,
+            variant_id: variantId,
+            product_name: productName,
+            price: price,
+            quantity: quantity,
+            image: image
+          },
+          dataType: 'json', // Mong muốn nhận về dữ liệu dạng JSON
+          success: function(response) {
+            // Xử lý kết quả trả về từ server
+            if (response.success) {
+
+              // **LOGIC SỬA LỖI TRÙNG LẶP:**
+              // 1. Tìm component giỏ hàng mini hiện tại bằng class của nó.
+              // QUAN TRỌNG: Đảm bảo chỉ có MỘT element với class này trên trang.
+              var $currentCart = $('.box-dropdown-cart');
+
+              // 2. Kiểm tra xem nó có tồn tại không.
+              if ($currentCart.length > 0) {
+                // 3. Hàm .replaceWith() của jQuery sẽ XÓA component cũ
+                // và THAY THẾ nó bằng HTML mới từ server.
+                // Đây là mấu chốt để không bị nhân đôi giỏ hàng.
+                $currentCart.replaceWith(response.new_mini_cart_html);
+              }
+              // **CẬP NHẬT 1:** Cập nhật số lượng trên icon giỏ hàng mini
+              /*$('#mini-cart-count').text(response.item_count);
+
+              // **CẬP NHẬT 2:** Cập nhật lại toàn bộ nội dung của dropdown
+              $('#mini-cart-dropdown').html(response.mini_cart_html);*/
+
+              // Hiển thị thông báo "toast" 
+              showSuccessToast(response.message);
+            } else {
+              // Hiển thị thông báo lỗi 
+              alert('Có lỗi xảy ra: ' + response.message);
+            }
+          },
+          error: function(xhr, status, error) {
+            // Xử lý khi AJAX bị lỗi 
+            console.error("Lỗi AJAX: ", error);
+            alert("Không thể thêm sản phẩm vào giỏ. Vui lòng thử lại.");
+          }
+        });
+      });
+    });
+  </script>
+  <div id="cart-toast" class="cart-toast">Đã thêm vào giỏ hàng!</div>
 </body>
 
 <!-- Mirrored from ecom-html.vercel.app/demo/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 02 Aug 2025 13:12:03 GMT -->

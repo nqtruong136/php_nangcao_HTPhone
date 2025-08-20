@@ -14,7 +14,7 @@ $cartItemCount = isset($cart['count']) ? $cart['count'] : 0;
     <?php foreach ($cartItems as $variant_id => $item): ?>
         <div class="item-cart mb-20">
             <div class="cart-image">
-                <img src="assets/imgs/phone/<?php echo htmlspecialchars($item['image']); ?>" alt="Product Image">
+                <img src="assets/<?php echo htmlspecialchars($item['image']); ?>" alt="Product Image">
             </div>
             <div class="cart-info">
                 <a class="font-sm-bold color-brand-3" href="?url=Details/index/<?php echo $item['product_id']; ?>">

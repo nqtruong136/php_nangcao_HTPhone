@@ -69,12 +69,12 @@ function render_product_card($product)
         <div class="image-box">
           {$discountLabel}
           <a href="?controller=Details&action=index&id={$product['MaSanPham']}">
-              <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
+              <img src="assets{$product['AnhDaiDien']}" alt="Product image">
           </a>
         </div>
         <div class="info-right">
             <a class="font-xs color-gray-500" href="#">{$product['TenNhaCungCap']}</a><br>
-            <a class="color-brand-3 font-sm-bold" href="?url=Details/index/{$product['MaSanPham']}">{$tenDayDu}</a>
+            <a class="color-brand-3 font-sm-bold" href="?controller=Details&action=index&id={$product['MaSanPham']}">{$tenDayDu}</a>
             <div class="rating">
                 {$stars}
                 <span class="font-xs color-gray-500">({$product['TongLuotDanhGia']})</span>
@@ -128,7 +128,7 @@ HTML;
                 <div class="product-image-slider">
                   <?php foreach ($galleryImages as $image): ?>
                     <figure class="border-radius-10">
-                      <img src="assets/imgs/page/product/<?php echo htmlspecialchars($image['URL_Anh']); ?>" alt="product image">
+                      <img src="assets/<?php echo htmlspecialchars($image['URL_Anh']); ?>" alt="product image">
                     </figure>
 
                   <?php endforeach; ?>
@@ -146,7 +146,7 @@ HTML;
                 <?php foreach ($galleryImages as $image): ?>
                   <div>
                     <div class="item-thumb">
-                      <img src="assets/imgs/page/product/<?php echo htmlspecialchars($image['URL_Anh']); ?>" alt="product image">
+                      <img src="assets/<?php echo htmlspecialchars($image['URL_Anh']); ?>" alt="product image">
                     </div>
                   </div>
                 <?php endforeach; ?>

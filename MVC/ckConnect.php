@@ -1,9 +1,9 @@
 <?php
 
-$host = ''; // hoặc localhost nếu máy của bạn
-$dbname = 'defaultdb';
+$host = 'database-nguyenquangtrung13062005-8a5b.l.aivencloud.com'; // hoặc localhost nếu máy của bạn
+$dbname = 'dulich';
 $user = 'avnadmin'; // hoặc user bạn tạo cho bạn của mình
-$pass = '';     // mật khẩu
+$pass = 'AVNS_MpspnXM3-9E7TgIuZb-';     // mật khẩu
 $port = 27925;   // nếu không phải cổng mặc định thì sửa lại
 $start = microtime(true);
 try {

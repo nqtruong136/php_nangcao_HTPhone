@@ -57,8 +57,8 @@ function render_top_selling_slider($products, $itemsPerSlide = 6)
         <div class="col-lg-6 col-md-6 col-sm-12">
             <div class="card-grid-style-2">
                 <div class="image-box">
-                    <a href="?url=Details/index/{$product['MaSanPham']}">
-                        <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product Image">
+                    <a href="?controller=Details&action=index&id={$product['MaSanPham']}">
+                        <img src="assets{$product['AnhDaiDien']}" alt="Product Image">
                     </a>
                 </div>
                 <div class="info-right">
@@ -162,7 +162,7 @@ function render_product_card_best_seller($product)
         <div class="image-box">
           {$discountLabel}
           <a href="?controller=Details&action=index&id={$product['MaSanPham']}">
-              <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
+              <img src="assets{$product['AnhDaiDien']}" alt="Product image">
           </a>
         </div>
         <div class="info-right">
@@ -238,12 +238,12 @@ function render_product_card_last_deals($product)
         <div class="image-box">
           {$discountLabel}
           <a href="?url=Details/index/{$product['MaSanPham']}">
-              <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
+              <img src="assets{$product['AnhDaiDien']}" alt="Product image">
           </a>
         </div>
         <div class="info-right">
             <a class="font-xs color-gray-500" href="#">{$product['TenNhaCungCap']}</a><br>
-            <a class="color-brand-3 font-sm-bold" href="?url=Details/index/{$product['MaSanPham']}">{$tenDayDu}</a>
+            <a class="color-brand-3 font-sm-bold" href="?controller=Details&action=index&id={$product['MaSanPham']}">{$tenDayDu}</a>
             <div class="rating">
                 {$stars}
                 <span class="font-xs color-gray-500">({$product['TongLuotDanhGia']})</span>
@@ -301,13 +301,13 @@ function render_product_card($product)
             <div class="image-box">
                 {$discountLabel}
                 <a href="?url=Details/index/{$product['MaSanPham']}">
-                    <img src="assets/imgs/phone/{$product['AnhDaiDien']}" alt="Product image">
+                    <img src="assets/gallery/{$product['AnhDaiDien']}" alt="Product image">
                 </a>
             </div>
             <div class="info-right">
                 <a class="font-xs color-gray-500" href="shop-vendor-single.html">{$product['TenNhaCungCap']}</a>
                 <br>
-                <a class="color-brand-3 font-sm-bold" href="?url=Details/index/{$product['MaSanPham']}">{$product['TenSanPham']}</a>
+                <a class="color-brand-3 font-sm-bold" href="?controller=Details&action=index&id={$product['MaSanPham']}">{$product['TenSanPham']}</a>
                 <div class="rating">
                     {$stars}
                     <span class="font-xs color-gray-500">({$product['TongLuotDanhGia']})</span>
